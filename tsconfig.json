@@ -19,8 +19,12 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    // Makes the generated `styled-system/*` imports resolve, exactly as they do
+    // in a consuming app. The directory is real, produced by `panda codegen`,
+    // and gitignored.
+    "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "panda.config.ts", "styled-system/**/*.ts"],
   "exclude": ["node_modules", "dist", "coverage"]
 }

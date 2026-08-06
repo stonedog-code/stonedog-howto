@@ -41,6 +41,15 @@ export {
   extractToc,
   type TocOptions,
 } from "./toc.js";
+export {
+  renderArticle,
+  type ArticleComponents,
+  type RenderArticleOptions,
+} from "./render/renderArticle.js";
+export { ArticleToc, type ArticleTocProps } from "./components/ArticleToc.js";
+export { HowToArticle, type HowToArticleProps } from "./components/HowToArticle.js";
+export { HowToNav, type HowToNavProps } from "./components/HowToNav.js";
+export { HowToSearch, type HowToSearchProps } from "./components/HowToSearch.js";
 export type {
   Article,
   ArticleMeta,

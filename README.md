@@ -139,14 +139,72 @@ content.
 
 ## Rendering
 
-This release covers the article model, arrangement, access control, tables of
-contents and search. The React rendering layer — the markdown renderer with
-anchored headings, and the navigation, search and table-of-contents components
-built on [`stonedog-style`](https://github.com/stonedog-code/stonedog-style) — is
-the next release.
+```tsx
+import { HowToArticle, HowToNav, HowToSearch, renderArticle } from "stonedog-howto";
 
-`extractToc`, `extractHeadings` and `extractPlainText` are usable with any
-renderer today, provided it slugs headings the same way.
+<HowToNav manifest={visible} hrefFor={(a) => `/how-to/${a.meta.slug}`} activeSlug={slug} />
+<HowToArticle article={article} />
+```
+
+`renderArticle` turns a body into React elements with anchored headings.
+Raw HTML in an article is **dropped, not rendered** — articles are documentation,
+and a pipeline that renders whatever markup an author pastes in is a
+script-injection route with an authoring interface in front of it.
+
+The renderer is style-agnostic. Pass `components` to substitute any element by
+tag name:
+
+```tsx
+renderArticle(article.body, {
+  components: { h2: MyHeading, a: MyLink, table: MyTable },
+});
+```
+
+A component that replaces a heading **must spread its props** — the anchor id
+arrives that way, and dropping it silently kills every table-of-contents link.
+
+`HowToNav` and `HowToSearch` hold no viewer and perform no access check. They
+render what they are handed, deliberately: the filtering has to happen on the
+server, where a client cannot decline to run it. Compose them as
+`filterManifest` → render, and `search(index, query, viewer)` → render.
+
+## The `stonedog-style` presentation layer
+
+A ready-made component map is available from a **separate entry point**:
+
+```tsx
+import { stonedogArticleComponents } from "stonedog-howto/styled";
+
+<HowToArticle article={article} components={stonedogArticleComponents} />
+```
+
+It is separate on purpose. The core package has no styling dependency; importing
+this module is what opts you into Panda CSS and the design system, and a host
+with its own components never loads it and never installs `stonedog-style`.
+Colours come from the host's theme layer — the same custom properties any
+`stonedog-style` consumer already provides.
+
+If you use this entry point, then in your own `panda.config.ts`:
+
+```ts
+presets: [
+  "@pandacss/preset-base",     // a `presets` array REPLACES the defaults —
+  "@pandacss/preset-panda",    // omit these and the recipes lose their tokens
+  stonedogStylePreset(),       // silently, with no build error
+],
+include: [
+  "./node_modules/stonedog-howto/src/**/*.{ts,tsx}",
+  "../../node_modules/stonedog-howto/src/**/*.{ts,tsx}",  // npm workspaces hoist
+  "./node_modules/stonedog-style/src/**/*.{ts,tsx}",
+  "../../node_modules/stonedog-style/src/**/*.{ts,tsx}",
+],
+```
+
+**List both paths for each.** Which one exists depends on how your workspace
+resolves, and a glob that matches nothing fails silently: Panda parses no
+source, emits no rules, and the components still render with the class names.
+The page is simply unstyled, with a green build. This package asserts its own
+globs resolve to real files in a test, and yours should too.
 
 ## Development
 

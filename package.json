@@ -1,5 +1,5 @@
 {
-  "name": "stonedog-howto",
+  "name": "@stonedogcode/howto",
   "version": "0.1.0",
   "description": "A how-to documentation surface for applications: markdown articles that describe themselves in frontmatter, section manifests, per-article tables of contents, search, and access control supplied by the host.",
   "license": "Apache-2.0",
@@ -10,14 +10,14 @@
   },
   "type": "module",
   "sideEffects": false,
-  "//exports": "This package ships TypeScript SOURCE, not a bundled dist/, for the same reason stonedog-style does: the React layer is styled with Panda CSS, which extracts styles by statically parsing source at the CONSUMER's build. A pre-bundled dist would emit class names the consumer's Panda never generated a stylesheet for. Consumers transpile us (Next.js: `transpilePackages: ['stonedog-howto']`) and add our src to their panda `include` globs.",
+  "//exports": "This package ships TypeScript SOURCE, not a bundled dist/, for the same reason stonedog-style does: the React layer is styled with Panda CSS, which extracts styles by statically parsing source at the CONSUMER's build. A pre-bundled dist would emit class names the consumer's Panda never generated a stylesheet for. Consumers transpile us (Next.js: `transpilePackages: ['@stonedogcode/howto']`) and add our src to their panda `include` globs.",
   "exports": {
     ".": "./src/index.ts",
     "./node": "./src/node/index.ts",
     "./styled": "./src/styled/index.ts",
     "./package.json": "./package.json"
   },
-  "//files": "The __tests__ exclusion is load-bearing, not tidiness. Consumers add `node_modules/stonedog-howto/src/**` to their Panda `include` globs, so anything shipped under src/ is statically parsed at THEIR build \u2014 and the tests import jest globals and render fixture markup. They also ship a test suite nobody can run to every consumer.",
+  "//files": "The __tests__ exclusion is load-bearing, not tidiness. Consumers add `node_modules/@stonedogcode/howto/src/**` to their Panda `include` globs, so anything shipped under src/ is statically parsed at THEIR build \u2014 and the tests import jest globals and render fixture markup. They also ship a test suite nobody can run to every consumer.",
   "files": [
     "src",
     "!src/**/__tests__/**",
@@ -98,5 +98,9 @@
     }
   },
   "//peerDependencies": "react/react-dom are peers ONLY. Listing them as dependencies too makes npm install a second copy into this package, and two Reacts in one tree fail at runtime with 'Invalid hook call' \u2014 a failure that points at the consumer's component, not at this manifest.",
-  "//publish:stonedog-howto": "Run from a terminal, interactively \u2014 npm prompts for the 2FA one-time password and the login flow needs a browser. It refuses a checkout that is detached, dirty, or behind origin/main, refuses a tarball containing tests or missing an entry point, and proves the result by installing from the registry into a temp directory."
+  "//publish:stonedog-howto": "Run from a terminal, interactively \u2014 npm prompts for the 2FA one-time password and the login flow needs a browser. It refuses a checkout that is detached, dirty, or behind origin/main, refuses a tarball containing tests or missing an entry point, and proves the result by installing from the registry into a temp directory.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "//publishConfig": "A scoped package defaults to RESTRICTED on npm, which requires a paid plan and would fail the publish. Declaring it here means the intent travels with the manifest instead of depending on someone remembering --access public."
 }

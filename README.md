@@ -39,6 +39,28 @@ Only `title` and `section` are required. `slug` defaults to the file's basename,
 `order` to `0`. Anything malformed throws, naming the file — a default that
 quietly puts an article in the wrong place is worse than a refusal.
 
+## Loading articles
+
+```ts
+import { loadArticles } from "stonedog-howto/node";
+
+const articles = loadArticles("./content/how-to", { sectionFromDirectory: true });
+```
+
+Reads every `.md` under the directory, recursively, in a stable order. A separate
+entry point, so a browser bundle never pulls `node:fs` in through the main
+export.
+
+`sectionFromDirectory` names each article's section after the directory it sits
+in — but only when the article did not declare one itself, so moving a file
+cannot silently re-section it. It is **off by default**: with it off, a missing
+`section` is an error naming the file rather than a guess.
+
+When one file in a hundred is malformed, the error names that file. That is the
+whole reason this exists rather than being left to each consumer's own walk-and-
+parse loop — the interesting behaviour is what happens to the bad file, and it
+would otherwise be reimplemented differently every time.
+
 ## Arranging sections
 
 The host declares the sections; articles slot themselves in by `section` and

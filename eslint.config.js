@@ -35,6 +35,15 @@ export default [
   },
   {
     files: ["src/**/__tests__/**/*.{ts,tsx}"],
-    languageOptions: { globals: { describe: "readonly", it: "readonly", expect: "readonly" } },
+    languageOptions: {
+      globals: {
+        describe: "readonly",
+        it: "readonly",
+        expect: "readonly",
+        // The integration tier resolves its fixture directory from the working
+        // directory, which the unit tiers never need.
+        process: "readonly",
+      },
+    },
   },
 ];

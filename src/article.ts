@@ -12,10 +12,22 @@ export interface ParseArticleOptions {
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-/** `articles/security/access-reviews.md` -> `access-reviews` */
+/**
+ * `articles/security/access-reviews.md` -> `access-reviews`
+ *
+ * Lowercased, because filename case is a local convention and a slug is a URL.
+ * Measured against a real hundred-article set, 29 of them were named
+ * `PRD-0001-…` and would otherwise have had to be either renamed or given an
+ * explicit `slug:` apiece — friction to satisfy a rule about capital letters
+ * that nothing downstream cares about. An explicit `slug` in frontmatter is
+ * still validated strictly; this only governs what a bare filename defaults to.
+ *
+ * Two filenames differing only in case collapse to one slug here. That is not a
+ * silent loss: `validateArticles` reports a duplicate slug and names both files.
+ */
 function slugFromPath(sourcePath: string): string {
   const base = sourcePath.split(/[/\\]/).pop() ?? sourcePath;
-  return base.replace(/\.[^.]+$/, "");
+  return base.replace(/\.[^.]+$/, "").toLowerCase();
 }
 
 function requireString(

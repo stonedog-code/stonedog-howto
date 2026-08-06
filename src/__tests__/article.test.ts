@@ -37,6 +37,26 @@ describe("parseArticle", () => {
     expect(article.meta.slug).toBe("access-reviews");
   });
 
+  it("lowercases a slug derived from the filename", () => {
+    // Filename case is a local convention; a slug is a URL. Measured against a
+    // real hundred-article set, 29 files were named `PRD-0001-…` — every one of
+    // them would otherwise have needed a rename or its own explicit `slug:`.
+    const article = parseArticle(doc(["title: Widget display toggle", "section: prds"]), {
+      sourcePath: "articles/prds/PRD-0001-widget-display-toggle.md",
+    });
+    expect(article.meta.slug).toBe("prd-0001-widget-display-toggle");
+  });
+
+  it("still rejects an explicit slug that is not lowercase", () => {
+    // The default is a convenience for filenames. A slug an author wrote out by
+    // hand is the URL they chose, and is held to the pattern.
+    expect(() =>
+      parseArticle(doc(["title: Notes", "section: features", "slug: PRD-0001"]), {
+        sourcePath: "notes.md",
+      }),
+    ).toThrow(/must be lowercase letters, digits and single hyphens/);
+  });
+
   it("defaults order to 0 and leaves summary and roles absent", () => {
     const article = parseArticle(doc(["title: Notes", "section: features"]), {
       sourcePath: "notes.md",

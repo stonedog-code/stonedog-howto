@@ -9,7 +9,10 @@ module.exports = {
   //
   // Requires NODE_OPTIONS=--experimental-vm-modules, set in the `test` script.
   preset: "ts-jest/presets/default-esm",
-  extensionsToTreatAsEsm: [".ts"],
+  // `.tsx` as well as `.ts`. Omitting it loads the component modules as
+  // CommonJS, where the first ESM-only import fails with "Must use import to
+  // load ES Module" — pointing at the dependency rather than at this list.
+  extensionsToTreatAsEsm: [".ts", ".tsx"],
   testEnvironment: "node",
   moduleNameMapper: {
     // Source imports carry `.js` specifiers because that is what real ESM
@@ -20,6 +23,10 @@ module.exports = {
   transform: {
     "^.+\\.tsx?$": ["ts-jest", { useESM: true }],
   },
-  testMatch: ["<rootDir>/src/**/__tests__/**/*.test.ts"],
-  collectCoverageFrom: ["src/**/*.ts", "!src/**/__tests__/**", "!src/index.ts"],
+  testMatch: ["<rootDir>/src/**/__tests__/**/*.test.{ts,tsx}"],
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/__tests__/**",
+    "!src/index.ts",
+  ],
 };

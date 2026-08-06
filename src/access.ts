@@ -1,5 +1,5 @@
-import type { Manifest, ManifestSection } from "./manifest.js";
-import type { Article, HowToViewer } from "./types.js";
+import type { Manifest, ManifestSection } from "./manifest";
+import type { Article, HowToViewer } from "./types";
 
 /** A viewer that sees everything. For development and for single-audience sites. */
 export const seesEverything: HowToViewer = { canSee: () => true };

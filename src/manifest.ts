@@ -1,5 +1,5 @@
-import { ManifestError, type ManifestProblem } from "./errors.js";
-import type { Article, HowToConfig, SectionDef } from "./types.js";
+import { ManifestError, type ManifestProblem } from "./errors";
+import type { Article, HowToConfig, SectionDef } from "./types";
 
 /** A section with the articles that landed in it, and its nested sections. */
 export interface ManifestSection {

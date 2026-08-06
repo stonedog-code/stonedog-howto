@@ -1,6 +1,6 @@
-import { filterManifest, roleSetViewer, seesEverything, visibleArticles } from "../access.js";
-import { buildManifest } from "../manifest.js";
-import type { Article, HowToConfig } from "../types.js";
+import { filterManifest, roleSetViewer, seesEverything, visibleArticles } from "../access";
+import { buildManifest } from "../manifest";
+import type { Article, HowToConfig } from "../types";
 
 const article = (slug: string, section: string, roles?: string[]): Article => ({
   meta: {

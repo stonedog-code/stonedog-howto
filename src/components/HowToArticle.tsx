@@ -1,10 +1,10 @@
 import type { ReactElement } from "react";
 
-import { extractToc } from "../toc.js";
-import { renderArticle, type ArticleComponents } from "../render/renderArticle.js";
-import type { Article, TocEntry } from "../types.js";
+import { extractToc } from "../toc";
+import { renderArticle, type ArticleComponents } from "../render/renderArticle";
+import type { Article, TocEntry } from "../types";
 
-import { ArticleToc } from "./ArticleToc.js";
+import { ArticleToc } from "./ArticleToc";
 
 export interface HowToArticleProps {
   article: Article;

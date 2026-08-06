@@ -1,9 +1,9 @@
 import { existsSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { renderArticle } from "../render/renderArticle.js";
-import { stonedogArticleComponents } from "../styled/articleComponents.js";
-import { extractToc } from "../toc.js";
+import { renderArticle } from "../render/renderArticle";
+import { stonedogArticleComponents } from "../styled/articleComponents";
+import { extractToc } from "../toc";
 
 const html = (markdown: string) =>
   renderToStaticMarkup(renderArticle(markdown, { components: stonedogArticleComponents }));

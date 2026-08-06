@@ -1,14 +1,14 @@
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { roleSetViewer } from "../access.js";
-import { ArticleToc } from "../components/ArticleToc.js";
-import { HowToArticle } from "../components/HowToArticle.js";
-import { HowToNav } from "../components/HowToNav.js";
-import { HowToSearch } from "../components/HowToSearch.js";
-import { buildManifest } from "../manifest.js";
-import { filterManifest } from "../access.js";
-import { buildSearchIndex, search } from "../search.js";
-import type { Article, HowToConfig } from "../types.js";
+import { roleSetViewer } from "../access";
+import { ArticleToc } from "../components/ArticleToc";
+import { HowToArticle } from "../components/HowToArticle";
+import { HowToNav } from "../components/HowToNav";
+import { HowToSearch } from "../components/HowToSearch";
+import { buildManifest } from "../manifest";
+import { filterManifest } from "../access";
+import { buildSearchIndex, search } from "../search";
+import type { Article, HowToConfig } from "../types";
 
 const article = (
   slug: string,

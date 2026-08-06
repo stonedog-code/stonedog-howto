@@ -1,6 +1,6 @@
-import { ArticleParseError } from "./errors.js";
-import { splitFrontmatter } from "./frontmatter.js";
-import type { Article, ArticleMeta } from "./types.js";
+import { ArticleParseError } from "./errors";
+import { splitFrontmatter } from "./frontmatter";
+import type { Article, ArticleMeta } from "./types";
 
 export interface ParseArticleOptions {
   /**

@@ -1,5 +1,5 @@
-import { extractHeadings, extractPlainText } from "./toc.js";
-import type { Article, HowToViewer, TocEntry } from "./types.js";
+import { extractHeadings, extractPlainText } from "./toc";
+import type { Article, HowToViewer, TocEntry } from "./types";
 
 /** One article, prepared for matching. */
 export interface IndexedArticle {

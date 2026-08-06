@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 
-import type { TocEntry } from "../types.js";
+import type { TocEntry } from "../types";
 
 export interface ArticleTocProps {
   entries: TocEntry[];

@@ -1,6 +1,6 @@
 import { parse as parseYaml } from "yaml";
 
-import { ArticleParseError } from "./errors.js";
+import { ArticleParseError } from "./errors";
 
 export interface SplitDocument {
   /** The parsed frontmatter block. Empty when the document had none. */

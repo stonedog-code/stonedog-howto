@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 
-import type { Manifest, ManifestSection } from "../manifest.js";
-import type { Article } from "../types.js";
+import type { Manifest, ManifestSection } from "../manifest";
+import type { Article } from "../types";
 
 export interface HowToNavProps {
   /**

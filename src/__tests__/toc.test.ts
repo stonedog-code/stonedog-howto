@@ -1,6 +1,6 @@
 import GithubSlugger from "github-slugger";
 
-import { extractHeadings, extractPlainText, extractToc } from "../toc.js";
+import { extractHeadings, extractPlainText, extractToc } from "../toc";
 
 describe("extractHeadings", () => {
   it("returns every heading with its depth and anchor id", () => {

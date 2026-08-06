@@ -1,0 +1,50 @@
+name: gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` rather than `npm install`: it installs exactly the lockfile and
+      # fails if package.json and the lockfile have drifted, which is the one
+      # check a local `npm install` can never perform because it just fixes the
+      # drift silently.
+      - run: npm ci
+
+      - run: npm run type-check
+
+      # No `--fix` anywhere in CI. A lint step that repairs the tree hides from
+      # review the errors review exists to catch, and leaves the repair
+      # uncommitted so the same error returns on the next checkout.
+      - run: npm run lint
+
+      - run: npm test
+
+      # A green gate that examined nothing is the failure this guards against:
+      # ESLint exits 0 while reporting "File ignored by default" for anything
+      # under a dot-directory, and a testMatch that resolves to no files also
+      # exits 0. Both read as "clean". Assert the gate actually looked at the
+      # source rather than trusting the exit code.
+      - name: Prove the gate was not vacuous
+        run: |
+          linted=$(npx eslint . -f json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).length))')
+          echo "eslint examined $linted files"
+          test "$linted" -ge 10
+
+          # `|| true` so a zero count reaches the assertion below and fails
+          # there with a readable message, rather than grep's bare exit 1
+          # aborting the step before it can say what was wrong.
+          typed=$(npx tsc --noEmit --listFiles | grep -c "/src/" || true)
+          echo "tsc included $typed files under src/"
+          test "$typed" -ge 10

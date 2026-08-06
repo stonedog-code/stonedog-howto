@@ -9,7 +9,11 @@ export default [
     files: ["src/**/*.ts", "src/**/*.tsx"],
     languageOptions: {
       parser: tsParser,
-      parserOptions: { ecmaVersion: "latest", sourceType: "module" },
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        ecmaFeatures: { jsx: true },
+      },
     },
     plugins: { "@typescript-eslint": tsPlugin },
     rules: {
@@ -25,7 +29,7 @@ export default [
     },
   },
   {
-    files: ["src/**/__tests__/**/*.ts"],
+    files: ["src/**/__tests__/**/*.{ts,tsx}"],
     languageOptions: { globals: { describe: "readonly", it: "readonly", expect: "readonly" } },
   },
 ];

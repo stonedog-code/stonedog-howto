@@ -139,14 +139,41 @@ content.
 
 ## Rendering
 
-This release covers the article model, arrangement, access control, tables of
-contents and search. The React rendering layer — the markdown renderer with
-anchored headings, and the navigation, search and table-of-contents components
-built on [`stonedog-style`](https://github.com/stonedog-code/stonedog-style) — is
-the next release.
+```tsx
+import { HowToArticle, HowToNav, HowToSearch, renderArticle } from "stonedog-howto";
 
-`extractToc`, `extractHeadings` and `extractPlainText` are usable with any
-renderer today, provided it slugs headings the same way.
+<HowToNav manifest={visible} hrefFor={(a) => `/how-to/${a.meta.slug}`} activeSlug={slug} />
+<HowToArticle article={article} />
+```
+
+`renderArticle` turns a body into React elements with anchored headings.
+Raw HTML in an article is **dropped, not rendered** — articles are documentation,
+and a pipeline that renders whatever markup an author pastes in is a
+script-injection route with an authoring interface in front of it.
+
+The renderer is style-agnostic. Pass `components` to substitute any element by
+tag name:
+
+```tsx
+renderArticle(article.body, {
+  components: { h2: MyHeading, a: MyLink, table: MyTable },
+});
+```
+
+A component that replaces a heading **must spread its props** — the anchor id
+arrives that way, and dropping it silently kills every table-of-contents link.
+
+`HowToNav` and `HowToSearch` hold no viewer and perform no access check. They
+render what they are handed, deliberately: the filtering has to happen on the
+server, where a client cannot decline to run it. Compose them as
+`filterManifest` → render, and `search(index, query, viewer)` → render.
+
+A presentation layer built on
+[`stonedog-style`](https://github.com/stonedog-code/stonedog-style) and
+[`stonedog-theme`](https://github.com/stonedog-code/stonedog-theme) is the next
+release; until then the components emit plain semantic elements with
+`data-testid` and `className` hooks, and `extractToc` / `extractHeadings` /
+`extractPlainText` work with any renderer that slugs headings the same way.
 
 ## Development
 

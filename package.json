@@ -35,8 +35,13 @@
   "dependencies": {
     "github-slugger": "^2.0.0",
     "mdast-util-to-string": "^4.0.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "rehype-react": "^8.0.0",
+    "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.0",
     "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
     "unified": "^11.0.0",
     "unist-util-visit": "^5.0.0",
     "yaml": "^2.6.0"
@@ -46,10 +51,13 @@
     "@types/jest": "^29.5.14",
     "@types/mdast": "^4.0.4",
     "@types/node": "^22.10.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.17.0",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "ts-jest": "^29.4.11",
     "typescript": "^5.9.3"
   },

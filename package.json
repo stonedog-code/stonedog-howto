@@ -39,7 +39,8 @@
     "prepare": "npm run panda:prepare",
     "pretype-check": "npm run panda:prepare",
     "pretest": "npm run panda:prepare",
-    "verify:package": "bash scripts/verify-package.sh"
+    "verify:package": "bash scripts/verify-package.sh",
+    "publish:stonedog-howto": "bash scripts/publish-package.sh"
   },
   "dependencies": {
     "github-slugger": "^2.0.0",
@@ -96,5 +97,6 @@
       "optional": true
     }
   },
-  "//peerDependencies": "react/react-dom are peers ONLY. Listing them as dependencies too makes npm install a second copy into this package, and two Reacts in one tree fail at runtime with 'Invalid hook call' \u2014 a failure that points at the consumer's component, not at this manifest."
+  "//peerDependencies": "react/react-dom are peers ONLY. Listing them as dependencies too makes npm install a second copy into this package, and two Reacts in one tree fail at runtime with 'Invalid hook call' \u2014 a failure that points at the consumer's component, not at this manifest.",
+  "//publish:stonedog-howto": "Run from a terminal, interactively \u2014 npm prompts for the 2FA one-time password and the login flow needs a browser. It refuses a checkout that is detached, dirty, or behind origin/main, refuses a tarball containing tests or missing an entry point, and proves the result by installing from the registry into a temp directory."
 }

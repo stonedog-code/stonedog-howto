@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 
-import type { SearchResult } from "../search.js";
-import type { Article } from "../types.js";
+import type { SearchResult } from "../search";
+import type { Article } from "../types";
 
 export interface HowToSearchProps {
   /** Current query. Controlled — the host owns the state and the debounce. */

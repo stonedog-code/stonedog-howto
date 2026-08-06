@@ -1,6 +1,6 @@
-import { ManifestError } from "../errors.js";
-import { buildManifest, validateArticles } from "../manifest.js";
-import type { Article, HowToConfig } from "../types.js";
+import { ManifestError } from "../errors";
+import { buildManifest, validateArticles } from "../manifest";
+import type { Article, HowToConfig } from "../types";
 
 const article = (
   slug: string,

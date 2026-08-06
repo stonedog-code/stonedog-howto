@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { renderArticle } from "../render/renderArticle.js";
-import { extractHeadings, extractToc } from "../toc.js";
+import { renderArticle } from "../render/renderArticle";
+import { extractHeadings, extractToc } from "../toc";
 
 const html = (markdown: string, components?: Parameters<typeof renderArticle>[1]) =>
   renderToStaticMarkup(renderArticle(markdown, components));

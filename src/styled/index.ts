@@ -16,4 +16,4 @@
  *     the components render with class names that have no CSS behind them.
  */
 
-export { stonedogArticleComponents } from "./articleComponents.js";
+export { stonedogArticleComponents } from "./articleComponents";

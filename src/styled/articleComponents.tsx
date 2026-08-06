@@ -1,7 +1,7 @@
 import { StyledHeading, StyledText } from "stonedog-style";
 import { css } from "styled-system/css";
 
-import type { ArticleComponents } from "../render/renderArticle.js";
+import type { ArticleComponents } from "../render/renderArticle";
 
 /**
  * The article body, rendered with `stonedog-style`.

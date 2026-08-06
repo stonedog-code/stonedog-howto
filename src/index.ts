@@ -6,27 +6,27 @@
  * surface. It contains no articles of its own, and no role model of its own.
  */
 
-export { parseArticle, type ParseArticleOptions } from "./article.js";
+export { parseArticle, type ParseArticleOptions } from "./article";
 export {
   filterManifest,
   roleSetViewer,
   seesEverything,
   visibleArticles,
   type RoleSetViewerOptions,
-} from "./access.js";
+} from "./access";
 export {
   ArticleParseError,
   HowToError,
   ManifestError,
   type ManifestProblem,
-} from "./errors.js";
-export { splitFrontmatter, type SplitDocument } from "./frontmatter.js";
+} from "./errors";
+export { splitFrontmatter, type SplitDocument } from "./frontmatter";
 export {
   buildManifest,
   validateArticles,
   type Manifest,
   type ManifestSection,
-} from "./manifest.js";
+} from "./manifest";
 export {
   buildSearchIndex,
   search,
@@ -34,22 +34,22 @@ export {
   type SearchIndex,
   type SearchOptions,
   type SearchResult,
-} from "./search.js";
+} from "./search";
 export {
   extractHeadings,
   extractPlainText,
   extractToc,
   type TocOptions,
-} from "./toc.js";
+} from "./toc";
 export {
   renderArticle,
   type ArticleComponents,
   type RenderArticleOptions,
-} from "./render/renderArticle.js";
-export { ArticleToc, type ArticleTocProps } from "./components/ArticleToc.js";
-export { HowToArticle, type HowToArticleProps } from "./components/HowToArticle.js";
-export { HowToNav, type HowToNavProps } from "./components/HowToNav.js";
-export { HowToSearch, type HowToSearchProps } from "./components/HowToSearch.js";
+} from "./render/renderArticle";
+export { ArticleToc, type ArticleTocProps } from "./components/ArticleToc";
+export { HowToArticle, type HowToArticleProps } from "./components/HowToArticle";
+export { HowToNav, type HowToNavProps } from "./components/HowToNav";
+export { HowToSearch, type HowToSearchProps } from "./components/HowToSearch";
 export type {
   Article,
   ArticleMeta,
@@ -57,4 +57,4 @@ export type {
   HowToViewer,
   SectionDef,
   TocEntry,
-} from "./types.js";
+} from "./types";

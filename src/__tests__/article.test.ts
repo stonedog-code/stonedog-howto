@@ -1,5 +1,5 @@
-import { parseArticle } from "../article.js";
-import { ArticleParseError } from "../errors.js";
+import { parseArticle } from "../article";
+import { ArticleParseError } from "../errors";
 
 const doc = (frontmatter: string[], body = "Body."): string =>
   ["---", ...frontmatter, "---", "", body].join("\n");

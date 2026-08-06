@@ -5,7 +5,7 @@ import remarkParse from "remark-parse";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
 
-import type { TocEntry } from "./types.js";
+import type { TocEntry } from "./types";
 
 import type { Root } from "mdast";
 

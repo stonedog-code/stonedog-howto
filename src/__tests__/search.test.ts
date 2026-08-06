@@ -1,6 +1,6 @@
-import { roleSetViewer, seesEverything } from "../access.js";
-import { buildSearchIndex, search } from "../search.js";
-import type { Article } from "../types.js";
+import { roleSetViewer, seesEverything } from "../access";
+import { buildSearchIndex, search } from "../search";
+import type { Article } from "../types";
 
 const article = (
   slug: string,

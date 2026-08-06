@@ -1,5 +1,5 @@
-import { ArticleParseError } from "../errors.js";
-import { splitFrontmatter } from "../frontmatter.js";
+import { ArticleParseError } from "../errors";
+import { splitFrontmatter } from "../frontmatter";
 
 describe("splitFrontmatter", () => {
   it("splits a fenced YAML block off the front", () => {

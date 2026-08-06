@@ -1,9 +1,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
-import { parseArticle } from "../article.js";
-import { splitFrontmatter } from "../frontmatter.js";
-import type { Article } from "../types.js";
+import { parseArticle } from "../article";
+import { splitFrontmatter } from "../frontmatter";
+import type { Article } from "../types";
 
 export interface LoadArticlesOptions {
   /** File extension to read. Defaults to `.md`. */

@@ -2,13 +2,13 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { filterManifest, roleSetViewer } from "../access.js";
-import { ArticleParseError } from "../errors.js";
-import { buildManifest } from "../manifest.js";
-import { loadArticles } from "../node/loadArticles.js";
-import { buildSearchIndex, search } from "../search.js";
-import { extractToc } from "../toc.js";
-import type { HowToConfig } from "../types.js";
+import { filterManifest, roleSetViewer } from "../access";
+import { ArticleParseError } from "../errors";
+import { buildManifest } from "../manifest";
+import { loadArticles } from "../node/loadArticles";
+import { buildSearchIndex, search } from "../search";
+import { extractToc } from "../toc";
+import type { HowToConfig } from "../types";
 
 /**
  * Integration tier: real markdown files, read off a real filesystem, all the way

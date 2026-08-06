@@ -13,7 +13,8 @@
   "//exports": "This package ships TypeScript SOURCE, not a bundled dist/, for the same reason stonedog-style does: the React layer is styled with Panda CSS, which extracts styles by statically parsing source at the CONSUMER's build. A pre-bundled dist would emit class names the consumer's Panda never generated a stylesheet for. Consumers transpile us (Next.js: `transpilePackages: ['stonedog-howto']`) and add our src to their panda `include` globs.",
   "exports": {
     ".": "./src/index.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./styled": "./src/styled/index.ts"
   },
   "files": [
     "src",
@@ -30,7 +31,11 @@
     "gate": "npm run type-check && npm run lint && npm run test",
     "version:bump:patch": "npm version patch --no-git-tag-version",
     "version:bump:minor": "npm version minor --no-git-tag-version",
-    "audit": "npm audit --audit-level=moderate"
+    "audit": "npm audit --audit-level=moderate",
+    "panda:prepare": "panda codegen",
+    "prepare": "npm run panda:prepare",
+    "pretype-check": "npm run panda:prepare",
+    "pretest": "npm run panda:prepare"
   },
   "dependencies": {
     "github-slugger": "^2.0.0",
@@ -48,6 +53,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@pandacss/dev": "^1.12.0",
     "@types/jest": "^29.5.14",
     "@types/mdast": "^4.0.4",
     "@types/node": "^22.10.0",
@@ -58,6 +64,7 @@
     "eslint": "^9.17.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "stonedog-style": "^0.5.0",
     "ts-jest": "^29.4.11",
     "typescript": "^5.9.3"
   },
@@ -70,5 +77,19 @@
     "how-to",
     "table-of-contents",
     "rbac"
-  ]
+  ],
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "stonedog-style": ">=0.5.0",
+    "@pandacss/dev": ">=1.9.0"
+  },
+  "peerDependenciesMeta": {
+    "stonedog-style": {
+      "optional": true
+    },
+    "@pandacss/dev": {
+      "optional": true
+    }
+  }
 }

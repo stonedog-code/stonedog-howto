@@ -42,9 +42,14 @@ jobs:
           echo "eslint examined $linted files"
           test "$linted" -ge 10
 
+          # Anchored to THIS checkout's src/. A bare "/src/" also matches
+          # node_modules/stonedog-style/src/, which ships TypeScript source —
+          # so the count would stay healthy even if this package's own sources
+          # had dropped out of the program entirely.
+          #
           # `|| true` so a zero count reaches the assertion below and fails
           # there with a readable message, rather than grep's bare exit 1
           # aborting the step before it can say what was wrong.
-          typed=$(npx tsc --noEmit --listFiles | grep -c "/src/" || true)
+          typed=$(npx tsc --noEmit --listFiles | grep -c "^$PWD/src/" || true)
           echo "tsc included $typed files under src/"
           test "$typed" -ge 10

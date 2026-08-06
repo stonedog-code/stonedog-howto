@@ -168,12 +168,43 @@ render what they are handed, deliberately: the filtering has to happen on the
 server, where a client cannot decline to run it. Compose them as
 `filterManifest` → render, and `search(index, query, viewer)` → render.
 
-A presentation layer built on
-[`stonedog-style`](https://github.com/stonedog-code/stonedog-style) and
-[`stonedog-theme`](https://github.com/stonedog-code/stonedog-theme) is the next
-release; until then the components emit plain semantic elements with
-`data-testid` and `className` hooks, and `extractToc` / `extractHeadings` /
-`extractPlainText` work with any renderer that slugs headings the same way.
+## The `stonedog-style` presentation layer
+
+A ready-made component map is available from a **separate entry point**:
+
+```tsx
+import { stonedogArticleComponents } from "stonedog-howto/styled";
+
+<HowToArticle article={article} components={stonedogArticleComponents} />
+```
+
+It is separate on purpose. The core package has no styling dependency; importing
+this module is what opts you into Panda CSS and the design system, and a host
+with its own components never loads it and never installs `stonedog-style`.
+Colours come from the host's theme layer — the same custom properties any
+`stonedog-style` consumer already provides.
+
+If you use this entry point, then in your own `panda.config.ts`:
+
+```ts
+presets: [
+  "@pandacss/preset-base",     // a `presets` array REPLACES the defaults —
+  "@pandacss/preset-panda",    // omit these and the recipes lose their tokens
+  stonedogStylePreset(),       // silently, with no build error
+],
+include: [
+  "./node_modules/stonedog-howto/src/**/*.{ts,tsx}",
+  "../../node_modules/stonedog-howto/src/**/*.{ts,tsx}",  // npm workspaces hoist
+  "./node_modules/stonedog-style/src/**/*.{ts,tsx}",
+  "../../node_modules/stonedog-style/src/**/*.{ts,tsx}",
+],
+```
+
+**List both paths for each.** Which one exists depends on how your workspace
+resolves, and a glob that matches nothing fails silently: Panda parses no
+source, emits no rules, and the components still render with the class names.
+The page is simply unstyled, with a green build. This package asserts its own
+globs resolve to real files in a test, and yours should too.
 
 ## Development
 

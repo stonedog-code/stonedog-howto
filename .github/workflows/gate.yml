@@ -36,6 +36,13 @@ jobs:
       # under a dot-directory, and a testMatch that resolves to no files also
       # exits 0. Both read as "clean". Assert the gate actually looked at the
       # source rather than trusting the exit code.
+      # Everything above runs against source files sitting in the checkout,
+      # where `files`, the `exports` map and the tarball contents are invisible.
+      # Those are precisely what breaks at publish time — after review, when the
+      # version is already burned and cannot be reused. So the package is packed,
+      # installed into a throwaway project, and used the way a consumer would.
+      - run: npm run verify:package
+
       - name: Prove the gate was not vacuous
         run: |
           linted=$(npx eslint . -f json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).length))')

@@ -17,8 +17,10 @@
     "./styled": "./src/styled/index.ts",
     "./package.json": "./package.json"
   },
+  "//files": "The __tests__ exclusion is load-bearing, not tidiness. Consumers add `node_modules/stonedog-howto/src/**` to their Panda `include` globs, so anything shipped under src/ is statically parsed at THEIR build \u2014 and the tests import jest globals and render fixture markup. They also ship a test suite nobody can run to every consumer.",
   "files": [
     "src",
+    "!src/**/__tests__/**",
     "LICENSE",
     "NOTICE",
     "README.md"
@@ -36,13 +38,12 @@
     "panda:prepare": "panda codegen",
     "prepare": "npm run panda:prepare",
     "pretype-check": "npm run panda:prepare",
-    "pretest": "npm run panda:prepare"
+    "pretest": "npm run panda:prepare",
+    "verify:package": "bash scripts/verify-package.sh"
   },
   "dependencies": {
     "github-slugger": "^2.0.0",
     "mdast-util-to-string": "^4.0.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
     "rehype-react": "^8.0.0",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.0",
@@ -65,6 +66,8 @@
     "eslint": "^9.17.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "stonedog-style": "^0.5.0",
     "ts-jest": "^29.4.11",
     "typescript": "^5.9.3"
@@ -92,5 +95,6 @@
     "@pandacss/dev": {
       "optional": true
     }
-  }
+  },
+  "//peerDependencies": "react/react-dom are peers ONLY. Listing them as dependencies too makes npm install a second copy into this package, and two Reacts in one tree fail at runtime with 'Invalid hook call' \u2014 a failure that points at the consumer's component, not at this manifest."
 }

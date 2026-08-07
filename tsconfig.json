@@ -23,8 +23,14 @@
     // Makes the generated `styled-system/*` imports resolve, exactly as they do
     // in a consuming app. The directory is real, produced by `panda codegen`,
     // and gitignored.
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@stonedogcode/howto": ["src/index.ts"],
+      "@stonedogcode/howto/node": ["src/node/index.ts"],
+      "@stonedogcode/howto/styled": ["src/styled/index.ts"]
+    }
   },
+  "//paths": "Needed because src/__tests__/demo.integration.test.ts reaches into demo/, which imports this package by its public specifier as a consumer does — so tsc follows it here and has to resolve it. Nothing under src/ imports the package's own name, so this affects only that reach. It is one of four places the same three aliases are written (demo/vite.config.ts, demo/tsconfig.json and jest.config.cjs are the others); they must agree, because each tool reads only its own.",
   "include": ["src/**/*.ts", "src/**/*.tsx", "panda.config.ts", "styled-system/**/*.ts"],
   "exclude": ["node_modules", "dist", "coverage"]
 }

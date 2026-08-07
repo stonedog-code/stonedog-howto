@@ -35,9 +35,80 @@ roles: [Admin, Support]
 …
 ```
 
-Only `title` and `section` are required. `slug` defaults to the file's basename,
-`order` to `0`. Anything malformed throws, naming the file — a default that
-quietly puts an article in the wrong place is worse than a refusal.
+Anything malformed throws, naming the file — a default that quietly puts an
+article in the wrong place is worse than a refusal.
+
+## The article format
+
+A file is frontmatter, then markdown. The frontmatter is a YAML block delimited
+by `---` on its own line at the very start of the file; everything after the
+closing delimiter is the body, and the body may be empty.
+
+| Field | Required | Type | Default | What it decides |
+| --- | --- | --- | --- | --- |
+| `title` | **yes** | string | — | The heading, and the label in navigation and search results. Not taken from a `#` in the body: an article is listed by title, so the title has to exist as data, and reading it from the body as well would give an article two titles that can disagree. |
+| `section` | **yes**¹ | string | — | Which section the article belongs to. Must match a section `id` the host declared, or `buildManifest` throws naming the file. |
+| `slug` | no | string | the filename without its extension, **lowercased** | The article's identifier, unique across the whole set. Two articles sharing one is an error, not a last-one-wins. Must match `^[a-z0-9]+(-[a-z0-9]+)*$` — it appears in URLs. |
+| `order` | no | number | `0` | Rank within the section, ascending. Ties break on title, so equal ranks still come out in a stable order rather than in whatever order the filesystem offered. |
+| `summary` | no | string | — | One line under the title in listings and search results. Ranked below the title and above headings when searching. Blank is treated as absent. |
+| `roles` | no | string[] | — | Who may read it. See below. |
+
+¹ Unless `sectionFromDirectory` is on, which supplies it from the directory.
+
+The default slug is lowercased because filename case is a local convention and a
+slug is a URL. An explicit `slug` is still validated strictly against the pattern
+above; only the bare-filename default is forgiving. Two filenames differing only
+in case collapse to one slug, and that is reported as a duplicate naming both
+files rather than silently losing one.
+
+**Keys the package does not know are ignored, not rejected.** A typo'd `sumary`
+does nothing, quietly. Worth knowing when an article is not behaving as its
+frontmatter appears to say.
+
+### `roles`, precisely
+
+`roles` is a **set**, not a level. The package never interprets a role name; it
+hands the list to the host's `canSee` and does as it is told.
+
+- **Omitted** — the article states no requirement, and the *viewer* decides
+  whether that means everyone or nobody. `roleSetViewer`'s `seesUnrestricted`
+  option is that decision, and it defaults to "everyone".
+- **A list of names** — readable by a reader holding **any one** of them. It is
+  a union, never an intersection: there is no way to express "Admin *and*
+  Auditor" in the article, because a requirement that two roles must be held
+  together is an authorisation rule and belongs in the host's `canSee`, where
+  the host can see the whole subject rather than one article's list.
+- **A bare string** (`roles: Facility Admin`, unquoted and unbracketed) is
+  accepted as a one-element list. It is a natural mistake and an unambiguous
+  one.
+- **An empty list** (`roles: []`) is **rejected**, naming the file. It would mean
+  "no role may see this", which is never what an author intends, and its effect
+  — the article silently disappearing — is invisible once rendered. Omit the
+  field to leave the audience to the host.
+
+The names are the *host's* role names. Different applications name their roles
+differently and that is expected: the article is the right place for the
+requirement because the article is the thing being protected, and the host is
+the right place for the interpretation because the host is the thing that knows
+who is reading.
+
+## See it running
+
+```bash
+npm install
+npm run dev     # → http://localhost:5174
+```
+
+[`demo/`](./demo) is a working how-to built from seven markdown articles in
+three directories, with Guest / User / Admin audiences and a switcher to
+impersonate each. Switching to Guest visibly removes the administration section,
+and the `/api/howto` response for that viewer does not contain its articles —
+which is the package's central claim, arranged so you can check it rather than
+take it on trust.
+
+It runs against this repository's `src/`, not the published package, so it is
+also the fastest way to see a change you are making. It is not published: `files`
+below ships `src/` alone.
 
 ## Loading articles
 

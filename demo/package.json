@@ -1,0 +1,24 @@
+{
+  "name": "@stonedogcode/howto-demo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A runnable how-to built from a directory of markdown articles, with three audiences and an impersonation switcher.",
+  "//private": "Never published. It is part of the repository so the package can be seen working; it is not part of the package, whose `files` list ships src/ alone.",
+  "type": "module",
+  "//scripts": "No `build`. The filtering lives in a dev-server middleware, so a static build would produce a site whose own /api/howto 404s — a broken artefact that looks like a working one. Moving the filtering into the client to make a build possible is the one change this demo must never accept. `type-check` covers compilation.",
+  "scripts": {
+    "dev": "vite",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.9.3",
+    "vite": "^6.0.0"
+  }
+}

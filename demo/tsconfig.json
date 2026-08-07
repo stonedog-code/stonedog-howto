@@ -1,0 +1,28 @@
+{
+  "//": "Held to the same strictness as the package it demonstrates. A demo type-checked more loosely than the library would let a call site through that a consumer's own build rejects — which is the one mistake a demo must not make, since its whole job is to be copied.",
+  "//paths": "compilerOptions.paths mirrors the `resolve.alias` in vite.config.ts. Both are needed and they must agree: Vite resolves at runtime and knows nothing of tsconfig paths; tsc resolves at check time and knows nothing of Vite's aliases. Pointing both at ../src is what makes the demo check and run against this working tree rather than the published tarball. (This note lives at the top level because tsc rejects unknown keys inside compilerOptions.)",
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node", "vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@stonedogcode/howto": ["../src/index.ts"],
+      "@stonedogcode/howto/node": ["../src/node/index.ts"],
+      "@stonedogcode/howto/styled": ["../src/styled/index.ts"]
+    }
+  },
+  "include": ["src", "server", "shared", "vite.config.ts"]
+}

@@ -6,7 +6,7 @@
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "strict": true,
-    // Both of these are held for the same reason stonedog-style holds them: this
+    // Both of these are held for the same reason @stonedogcode/style holds them: this
     // package ships SOURCE, so consumers type-check OUR code under THEIR config.
     // A strictness flag we do not hold becomes a build error in a repo that does
     // not own the offending line.

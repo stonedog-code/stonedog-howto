@@ -11,7 +11,7 @@
 # human — neither works unattended, which is why this is a script you run
 # rather than a step in CI.
 #
-# Modelled on stonedog-style's script of the same name, and it keeps that one's
+# Modelled on @stonedogcode/style's script of the same name, and it keeps that one's
 # central lesson: a publish that prints no error can still have published
 # nothing, or the wrong thing. So this reads the tarball before publishing and
 # installs from the registry afterwards, because "the registry lists it" and
@@ -21,7 +21,7 @@
 # ## The traps specific to THIS package
 #
 # 0. **The name is SCOPED, and that is settled.** It was briefly renamed to the
-#    unscoped `stonedog-howto` on 2026-08-07 to match stonedog-style/theme/rbac,
+#    unscoped `stonedog-howto` on 2026-08-07 to match the then-unscoped style/theme/rbac,
 #    then reverted the same day when the decision went the other way: all five
 #    shared packages scope under @stonedogcode (NEH-482). The rename never
 #    reached the registry, so `stonedog-howto` does not exist and nothing

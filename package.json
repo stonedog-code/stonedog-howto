@@ -12,7 +12,7 @@
   "sideEffects": false,
   "//workspaces": "`demo` only, and it is private. The `files` list below ships src/ alone, so the demo travels with the repository and never with the tarball.",
   "workspaces": ["demo"],
-  "//exports": "This package ships TypeScript SOURCE, not a bundled dist/, for the same reason stonedog-style does: the React layer is styled with Panda CSS, which extracts styles by statically parsing source at the CONSUMER's build. A pre-bundled dist would emit class names the consumer's Panda never generated a stylesheet for. Consumers transpile us (Next.js: `transpilePackages: ['@stonedogcode/howto']`) and add our src to their panda `include` globs.",
+  "//exports": "This package ships TypeScript SOURCE, not a bundled dist/, for the same reason @stonedogcode/style does: the React layer is styled with Panda CSS, which extracts styles by statically parsing source at the CONSUMER's build. A pre-bundled dist would emit class names the consumer's Panda never generated a stylesheet for. Consumers transpile us (Next.js: `transpilePackages: ['@stonedogcode/howto']`) and add our src to their panda `include` globs.",
   "exports": {
     ".": "./src/index.ts",
     "./node": "./src/node/index.ts",
@@ -75,7 +75,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "stonedog-style": "^0.5.0",
+    "@stonedogcode/style": "^0.9.0",
     "ts-jest": "^29.4.11",
     "typescript": "^5.9.3"
   },
@@ -92,11 +92,11 @@
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18",
-    "stonedog-style": ">=0.5.0",
+    "@stonedogcode/style": ">=0.9.0",
     "@pandacss/dev": ">=1.9.0"
   },
   "peerDependenciesMeta": {
-    "stonedog-style": {
+    "@stonedogcode/style": {
       "optional": true
     },
     "@pandacss/dev": {

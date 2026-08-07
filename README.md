@@ -261,7 +261,7 @@ render what they are handed, deliberately: the filtering has to happen on the
 server, where a client cannot decline to run it. Compose them as
 `filterManifest` → render, and `search(index, query, viewer)` → render.
 
-## The `stonedog-style` presentation layer
+## The `@stonedogcode/style` presentation layer
 
 A ready-made component map is available from a **separate entry point**:
 
@@ -273,9 +273,9 @@ import { stonedogArticleComponents } from "@stonedogcode/howto/styled";
 
 It is separate on purpose. The core package has no styling dependency; importing
 this module is what opts you into Panda CSS and the design system, and a host
-with its own components never loads it and never installs `stonedog-style`.
+with its own components never loads it and never installs `@stonedogcode/style`.
 Colours come from the host's theme layer — the same custom properties any
-`stonedog-style` consumer already provides.
+`@stonedogcode/style` consumer already provides.
 
 If you use this entry point, then in your own `panda.config.ts`:
 
@@ -288,8 +288,8 @@ presets: [
 include: [
   "./node_modules/@stonedogcode/howto/src/**/*.{ts,tsx}",
   "../../node_modules/@stonedogcode/howto/src/**/*.{ts,tsx}",  // npm workspaces hoist
-  "./node_modules/stonedog-style/src/**/*.{ts,tsx}",
-  "../../node_modules/stonedog-style/src/**/*.{ts,tsx}",
+  "./node_modules/@stonedogcode/style/src/**/*.{ts,tsx}",
+  "../../node_modules/@stonedogcode/style/src/**/*.{ts,tsx}",
 ],
 ```
 

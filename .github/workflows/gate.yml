@@ -50,7 +50,7 @@ jobs:
           test "$linted" -ge 10
 
           # Anchored to THIS checkout's src/. A bare "/src/" also matches
-          # node_modules/stonedog-style/src/, which ships TypeScript source —
+          # node_modules/@stonedogcode/style/src/, which ships TypeScript source —
           # so the count would stay healthy even if this package's own sources
           # had dropped out of the program entirely.
           #

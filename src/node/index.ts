@@ -1,5 +1,5 @@
 /**
- * Filesystem helpers (`@stonedogcode/howto/node`).
+ * Filesystem helpers (`stonedog-howto/node`).
  *
  * A separate entry point so a browser bundle never pulls `node:fs` in through
  * the package's main export.

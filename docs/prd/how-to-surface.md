@@ -8,7 +8,7 @@ keeps getting re-solved, differently, in each application — so the explanation
 diverge in structure, navigation and quality even when the products are built by
 the same people.
 
-`@stonedogcode/howto` is that place, once: markdown articles that describe themselves,
+`stonedog-howto` is that place, once: markdown articles that describe themselves,
 arranged into sections the host declares, filtered by access rules the host owns,
 with a per-article table of contents and search across the set.
 

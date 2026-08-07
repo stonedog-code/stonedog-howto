@@ -55,8 +55,8 @@ import {
   parseArticle, buildManifest, filterManifest, roleSetViewer,
   extractToc, buildSearchIndex, search,
   type Article, type HowToConfig, type HowToViewer,
-} from "@stonedogcode/howto";
-import { loadArticles } from "@stonedogcode/howto/node";
+} from "stonedog-howto";
+import { loadArticles } from "stonedog-howto/node";
 
 const config: HowToConfig = { sections: [{ id: "general", title: "General" }] };
 const article: Article = parseArticle(

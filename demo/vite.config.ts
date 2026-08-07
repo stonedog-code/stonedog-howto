@@ -82,19 +82,19 @@ export default defineConfig({
      * `src/access.ts` changes what the demo does on the next reload.
      *
      * An alias rather than a workspace dependency, deliberately.
-     * `@stonedogcode/howto` is a real, published package: declaring it as a
+     * `stonedog-howto` is a real, published package: declaring it as a
      * dependency of the demo invites npm to install 0.1.1 from the registry,
      * and the demo would then quietly demonstrate the last release instead of
      * the branch under review — with everything still building.
      *
-     * The exact-match `find` entries are needed because `@stonedogcode/howto`
-     * is a prefix of `@stonedogcode/howto/node`; a plain string alias would
+     * The exact-match `find` entries are needed because `stonedog-howto`
+     * is a prefix of `stonedog-howto/node`; a plain string alias would
      * rewrite the subpath imports into the wrong file.
      */
     alias: [
-      { find: /^@stonedogcode\/howto$/, replacement: resolve(packageSrc, "index.ts") },
-      { find: /^@stonedogcode\/howto\/node$/, replacement: resolve(packageSrc, "node/index.ts") },
-      { find: /^@stonedogcode\/howto\/styled$/, replacement: resolve(packageSrc, "styled/index.ts") },
+      { find: /^stonedog-howto$/, replacement: resolve(packageSrc, "index.ts") },
+      { find: /^stonedog-howto\/node$/, replacement: resolve(packageSrc, "node/index.ts") },
+      { find: /^stonedog-howto\/styled$/, replacement: resolve(packageSrc, "styled/index.ts") },
     ],
   },
   server: { port: 5174 },

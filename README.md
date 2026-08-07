@@ -1,4 +1,4 @@
-# @stonedogcode/howto
+# stonedog-howto
 
 A how-to documentation surface for applications.
 
@@ -7,7 +7,7 @@ directory of them into an arranged, access-controlled, searchable surface. It
 ships no articles of its own, and no role model of its own.
 
 ```bash
-npm install @stonedogcode/howto
+npm install stonedog-howto
 ```
 
 ## Why articles describe themselves
@@ -113,7 +113,7 @@ below ships `src/` alone.
 ## Loading articles
 
 ```ts
-import { loadArticles } from "@stonedogcode/howto/node";
+import { loadArticles } from "stonedog-howto/node";
 
 const articles = loadArticles("./content/how-to", { sectionFromDirectory: true });
 ```
@@ -138,7 +138,7 @@ The host declares the sections; articles slot themselves in by `section` and
 `order`.
 
 ```ts
-import { buildManifest, type HowToConfig } from "@stonedogcode/howto";
+import { buildManifest, type HowToConfig } from "stonedog-howto";
 
 const config: HowToConfig = {
   sections: [
@@ -195,7 +195,7 @@ about.
 ## Tables of contents
 
 ```ts
-import { extractToc } from "@stonedogcode/howto";
+import { extractToc } from "stonedog-howto";
 
 const toc = extractToc(article.body); // [{ id, text, depth }, …]
 ```
@@ -214,7 +214,7 @@ fails: the page just does not move when the link is clicked.
 ## Search
 
 ```ts
-import { buildSearchIndex, search } from "@stonedogcode/howto";
+import { buildSearchIndex, search } from "stonedog-howto";
 
 const index = buildSearchIndex(articles); // parse once
 const results = search(index, "sharing a link", viewer);
@@ -233,7 +233,7 @@ content.
 ## Rendering
 
 ```tsx
-import { HowToArticle, HowToNav, HowToSearch, renderArticle } from "@stonedogcode/howto";
+import { HowToArticle, HowToNav, HowToSearch, renderArticle } from "stonedog-howto";
 
 <HowToNav manifest={visible} hrefFor={(a) => `/how-to/${a.meta.slug}`} activeSlug={slug} />
 <HowToArticle article={article} />
@@ -266,7 +266,7 @@ server, where a client cannot decline to run it. Compose them as
 A ready-made component map is available from a **separate entry point**:
 
 ```tsx
-import { stonedogArticleComponents } from "@stonedogcode/howto/styled";
+import { stonedogArticleComponents } from "stonedog-howto/styled";
 
 <HowToArticle article={article} components={stonedogArticleComponents} />
 ```
@@ -286,8 +286,8 @@ presets: [
   stonedogStylePreset(),       // silently, with no build error
 ],
 include: [
-  "./node_modules/@stonedogcode/howto/src/**/*.{ts,tsx}",
-  "../../node_modules/@stonedogcode/howto/src/**/*.{ts,tsx}",  // npm workspaces hoist
+  "./node_modules/stonedog-howto/src/**/*.{ts,tsx}",
+  "../../node_modules/stonedog-howto/src/**/*.{ts,tsx}",  // npm workspaces hoist
   "./node_modules/stonedog-style/src/**/*.{ts,tsx}",
   "../../node_modules/stonedog-style/src/**/*.{ts,tsx}",
 ],

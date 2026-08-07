@@ -70,12 +70,12 @@ falsify it if it were untrue.
 switcher in the header needs the viewer labels, and importing them from
 `server/howto.ts` would drag `node:fs` into the browser bundle through the
 article loader. The package puts its filesystem helpers behind a separate entry
-point (`@stonedogcode/howto/node`) precisely so that cannot happen by accident,
+point (`stonedog-howto/node`) precisely so that cannot happen by accident,
 and a demo that defeated that would be a poor advertisement for it.
 
 The demo is styled with plain CSS in `src/styles.css`, hanging off the
 `data-testid` attributes the components already emit. Nothing here required a
-change to the package. A demo built on `@stonedogcode/howto/styled` would show
+change to the package. A demo built on `stonedog-howto/styled` would show
 what the design system looks like; this shows what you get with none.
 
 ## Two things it does that a real application must not

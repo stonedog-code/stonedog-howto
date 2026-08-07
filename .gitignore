@@ -4,3 +4,4 @@ dist/
 styled-system/
 *.log
 .DS_Store
+demo/dist/

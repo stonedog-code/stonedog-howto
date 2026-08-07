@@ -24,6 +24,17 @@ module.exports = {
     // baseUrl, so it needs the mapping spelled out or every styled import dies
     // with "Cannot find module 'styled-system/css'".
     "^styled-system/(.*)$": "<rootDir>/styled-system/$1",
+    // The demo imports the package by its public specifier, as a consumer does.
+    // Anchored with `$` so the bare entry point cannot swallow the subpaths.
+    //
+    // This is the THIRD place these three aliases are written — `resolve.alias`
+    // in demo/vite.config.ts and `paths` in demo/tsconfig.json are the others.
+    // They must agree, and each exists because the tool reading it knows
+    // nothing of the other two. All three point at `src/`, which is what stops
+    // the demo silently exercising the published 0.1.1 instead of this branch.
+    "^@stonedogcode/howto$": "<rootDir>/src/index.ts",
+    "^@stonedogcode/howto/node$": "<rootDir>/src/node/index.ts",
+    "^@stonedogcode/howto/styled$": "<rootDir>/src/styled/index.ts",
   },
   transform: {
     "^.+\\.tsx?$": ["ts-jest", { useESM: true }],

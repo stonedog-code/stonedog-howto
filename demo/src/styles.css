@@ -1,0 +1,432 @@
+/*
+ * Plain CSS, on purpose.
+ *
+ * The core package is style-agnostic — it renders semantic markup and lets the
+ * host dress it — so the demo dresses it by hand rather than reaching for
+ * `@stonedogcode/howto/styled`. A demo built on the design system would show
+ * what the design system looks like; this shows what you get with none.
+ *
+ * Selectors hang off the `data-testid` attributes the components already emit,
+ * so nothing here required a change to the package.
+ */
+
+:root {
+  --ink: #16181d;
+  --ink-soft: #5b6472;
+  --paper: #ffffff;
+  --sunken: #f4f6f9;
+  --line: #dde2ea;
+  --accent: #2f5fd0;
+  --accent-soft: #e8eefc;
+  --gate: #8a5a00;
+  --gate-soft: #fdf4e3;
+  --radius: 8px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e8ebf1;
+    --ink-soft: #9aa4b4;
+    --paper: #14161b;
+    --sunken: #1c1f26;
+    --line: #2c313b;
+    --accent: #7ea6ff;
+    --accent-soft: #1d2536;
+    --gate: #e0b56a;
+    --gate-soft: #2a2317;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+code,
+pre {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.9em;
+}
+
+.layout {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+/* ---------- header ---------- */
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.brand span {
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+}
+
+.switcher fieldset {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem 0.75rem;
+  margin: 0;
+}
+
+.switcher legend {
+  padding: 0 0.35rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.viewers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.viewer {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "radio label" "radio blurb";
+  gap: 0 0.5rem;
+  align-items: center;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  max-width: 15rem;
+}
+
+.viewer.current {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.viewer input {
+  grid-area: radio;
+  margin: 0;
+}
+
+.viewer-label {
+  grid-area: label;
+  font-weight: 600;
+}
+
+.viewer-blurb {
+  grid-area: blurb;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.unrestricted {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.caveat {
+  margin: 0.5rem 0 0;
+  max-width: 34rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.disclosure {
+  margin: 1.25rem 0 0;
+  padding: 0.7rem 0.9rem;
+  background: var(--sunken);
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+}
+
+.disclosure code {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+  margin-right: 0.25rem;
+}
+
+/* ---------- layout ---------- */
+
+.body {
+  display: grid;
+  grid-template-columns: 17rem minmax(0, 1fr);
+  gap: 2.5rem;
+  margin-top: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 56rem) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.loading,
+.error {
+  padding: 3rem 1.5rem;
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+.error pre {
+  white-space: pre-wrap;
+  background: var(--sunken);
+  padding: 0.9rem;
+  border-radius: var(--radius);
+  border-left: 3px solid var(--gate);
+}
+
+/* ---------- search ---------- */
+
+[data-testid="howto-search"] label {
+  display: block;
+}
+
+[data-testid="howto-search"] label > span {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin-bottom: 0.35rem;
+}
+
+[data-testid="howto-search-input"] {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: inherit;
+  font: inherit;
+}
+
+[data-testid="howto-search-results"] {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+[data-testid="howto-search-results"] > li > a {
+  font-weight: 600;
+}
+
+[data-testid="howto-search-results"] p {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+[data-testid="howto-search-results"] ul {
+  margin: 0.3rem 0 0;
+  padding-left: 1rem;
+  font-size: 0.8rem;
+}
+
+[data-testid="howto-search-empty"] {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+/* ---------- navigation ---------- */
+
+.nav {
+  margin-top: 1.75rem;
+}
+
+.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav > ul > li {
+  margin-bottom: 1.25rem;
+}
+
+.nav [data-testid^="howto-nav-section-"] > span {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin-bottom: 0.4rem;
+}
+
+.nav ul ul {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.nav [data-testid^="howto-nav-section-"] [data-testid^="howto-nav-section-"] {
+  margin-top: 0.6rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--line);
+}
+
+.nav a {
+  display: block;
+  padding: 0.28rem 0.5rem;
+  border-radius: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav a:hover {
+  background: var(--sunken);
+}
+
+.nav a[aria-current="page"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ---------- article ---------- */
+
+.gate {
+  display: inline-block;
+  margin: 0 0 1rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: var(--gate-soft);
+  color: var(--gate);
+  font-size: 0.78rem;
+}
+
+.gate.open {
+  background: var(--sunken);
+  color: var(--ink-soft);
+}
+
+.gate code {
+  margin-left: 0.3rem;
+}
+
+[data-testid="howto-article"] > header > h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+[data-testid="howto-article"] > header > p {
+  margin: 0.4rem 0 0;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+}
+
+[data-testid="howto-article-toc"] {
+  margin: 1.75rem 0;
+  padding: 0.85rem 1rem;
+  background: var(--sunken);
+  border-radius: var(--radius);
+}
+
+[data-testid="howto-article-toc"]::before {
+  content: "On this page";
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin-bottom: 0.4rem;
+}
+
+[data-testid="howto-article-toc"] ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.9rem;
+}
+
+[data-testid="howto-article-toc"] li[data-depth="1"] {
+  padding-left: 1rem;
+}
+
+[data-testid="howto-article-body"] h2 {
+  margin: 2.25rem 0 0.6rem;
+  font-size: 1.3rem;
+  scroll-margin-top: 1rem;
+}
+
+[data-testid="howto-article-body"] h3 {
+  margin: 1.75rem 0 0.5rem;
+  font-size: 1.05rem;
+  scroll-margin-top: 1rem;
+}
+
+[data-testid="howto-article-body"] p,
+[data-testid="howto-article-body"] li {
+  max-width: 42rem;
+}
+
+[data-testid="howto-article-body"] pre {
+  background: var(--sunken);
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+[data-testid="howto-article-body"] :not(pre) > code {
+  background: var(--sunken);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+}
+
+[data-testid="howto-article-body"] table {
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+[data-testid="howto-article-body"] th,
+[data-testid="howto-article-body"] td {
+  border: 1px solid var(--line);
+  padding: 0.45rem 0.7rem;
+  text-align: left;
+}
+
+[data-testid="howto-article-body"] th {
+  background: var(--sunken);
+}
+
+a {
+  color: var(--accent);
+}

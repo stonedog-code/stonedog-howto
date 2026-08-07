@@ -2,7 +2,7 @@
 # Copyright (C) 2026 StoneDogCode L.L.C.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Publish @stonedogcode/howto to npm, end to end.
+# Publish stonedog-howto to npm, end to end.
 #
 #   npm run publish:stonedog-howto
 #
@@ -21,7 +21,7 @@
 # ## The traps specific to THIS package
 #
 # 1. It ships TypeScript SOURCE under `src/`, and consumers add
-#    `node_modules/@stonedogcode/howto/src/**` to their Panda `include` globs. So
+#    `node_modules/stonedog-howto/src/**` to their Panda `include` globs. So
 #    anything shipped under src/ is statically parsed at the CONSUMER's build.
 #    `files: ["src"]` therefore shipped the entire test suite until it was
 #    caught — jest globals and fixture markup, parsed by every consumer. The
@@ -36,7 +36,7 @@
 #    consumer's component rather than at this manifest.
 set -euo pipefail
 
-PACKAGE_NAME="@stonedogcode/howto"
+PACKAGE_NAME="stonedog-howto"
 # Sanity floor for the tarball. Comfortably under the real count (22) so
 # ordinary growth does not trip it, far above what a `files`-misconfigured
 # package would produce (3: package.json, README, LICENSE).

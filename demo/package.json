@@ -1,5 +1,5 @@
 {
-  "name": "@stonedogcode/howto-demo",
+  "name": "stonedog-howto-demo",
   "version": "0.0.0",
   "private": true,
   "description": "A runnable how-to built from a directory of markdown articles, with three audiences and an impersonation switcher.",

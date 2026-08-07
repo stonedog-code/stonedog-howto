@@ -3,7 +3,7 @@
  *
  * The core package is style-agnostic — it renders semantic markup and lets the
  * host dress it — so the demo dresses it by hand rather than reaching for
- * `@stonedogcode/howto/styled`. A demo built on the design system would show
+ * `stonedog-howto/styled`. A demo built on the design system would show
  * what the design system looks like; this shows what you get with none.
  *
  * Selectors hang off the `data-testid` attributes the components already emit,

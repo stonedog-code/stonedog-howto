@@ -24,7 +24,7 @@ import { globSync } from "tinyglobby";
  *
  * The extensions were never required: `moduleResolution: "bundler"` resolves
  * extensionless relative imports, which is what the sibling design-system
- * package `stonedog-style` has always done — it ships TS source the same way
+ * package `@stonedogcode/style` has always done — it ships TS source the same way
  * and carries zero `.js` specifiers, which is why it bundles cleanly.
  *
  * Bare specifiers are deliberately NOT checked: `foo/bar.js` in a dependency

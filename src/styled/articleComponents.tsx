@@ -1,10 +1,10 @@
-import { StyledHeading, StyledText } from "stonedog-style";
+import { StyledHeading, StyledText } from "@stonedogcode/style";
 import { css } from "styled-system/css";
 
 import type { ArticleComponents } from "../render/renderArticle";
 
 /**
- * The article body, rendered with `stonedog-style`.
+ * The article body, rendered with `@stonedogcode/style`.
  *
  * This is one `ArticleComponents` map among any number a host might write — the
  * renderer has no dependency on it, and importing it is what opts a consumer

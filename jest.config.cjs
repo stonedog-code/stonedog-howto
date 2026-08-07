@@ -39,13 +39,13 @@ module.exports = {
   transform: {
     "^.+\\.tsx?$": ["ts-jest", { useESM: true }],
   },
-  // `stonedog-style` ships TypeScript SOURCE rather than a bundle (Panda has to
+  // `@stonedogcode/style` ships TypeScript SOURCE rather than a bundle (Panda has to
   // statically parse it at the consumer's build). Jest does not transform
   // node_modules by default, so its `.ts` files reach Node's ESM loader raw and
   // fail on the first `export type`. It is named explicitly rather than opening
   // node_modules wholesale: everything else in this tree is already ESM and
   // needs no transform, and transforming all of it would be slow for nothing.
-  transformIgnorePatterns: ["/node_modules/(?!stonedog-style/)", "\\.pnp\\.[^\\\\]+$"],
+  transformIgnorePatterns: ["/node_modules/(?!@stonedogcode/style/)", "\\.pnp\\.[^\\\\]+$"],
   testMatch: ["<rootDir>/src/**/__tests__/**/*.test.{ts,tsx}"],
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",

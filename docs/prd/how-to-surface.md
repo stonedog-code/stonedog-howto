@@ -156,7 +156,7 @@ Articles are parsed once into an index rather than per keystroke.
    No rendering. Usable today by a host with its own renderer, provided that
    renderer slugs headings the same way.
 2. **The React layer** — markdown renderer with anchored headings, and the
-   navigation, search and table-of-contents components built on `stonedog-style`.
+   navigation, search and table-of-contents components built on `@stonedogcode/style`.
 3. **Adoption**, one application at a time, each landing after the release it
    depends on is published.
 

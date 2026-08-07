@@ -1,5 +1,5 @@
 import { defineConfig } from "@pandacss/dev";
-import { stonedogStylePreset } from "stonedog-style/preset";
+import { stonedogStylePreset } from "@stonedogcode/style/preset";
 
 /**
  * This package's OWN Panda config, so it can typecheck and test its styled
@@ -24,7 +24,7 @@ export default defineConfig({
   presets: ["@pandacss/preset-base", "@pandacss/preset-panda", stonedogStylePreset()],
 
   /**
-   * `stonedog-style` is listed because it ships TypeScript SOURCE: Panda finds
+   * `@stonedogcode/style` is listed because it ships TypeScript SOURCE: Panda finds
    * styles by statically parsing files at the CONSUMER's build, and a package
    * Panda never parses contributes no CSS — its components then render with
    * class names that have no rules behind them, with nothing failing anywhere.
@@ -35,8 +35,8 @@ export default defineConfig({
    */
   include: [
     "./src/**/*.{ts,tsx}",
-    "./node_modules/stonedog-style/src/**/*.{ts,tsx}",
-    "../../node_modules/stonedog-style/src/**/*.{ts,tsx}",
+    "./node_modules/@stonedogcode/style/src/**/*.{ts,tsx}",
+    "../../node_modules/@stonedogcode/style/src/**/*.{ts,tsx}",
   ],
   exclude: ["./src/**/__tests__/**/*"],
 

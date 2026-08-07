@@ -1,9 +1,20 @@
 import { existsSync } from "node:fs";
+
 import { renderToStaticMarkup } from "react-dom/server";
+import { globSync } from "tinyglobby";
+
+import pandaConfig from "../../panda.config";
 
 import { renderArticle } from "../render/renderArticle";
 import { stonedogArticleComponents } from "../styled/articleComponents";
 import { extractToc } from "../toc";
+
+// Globs in panda.config.ts are written relative to the repository root, which is
+// where `panda codegen` runs. Jest's `rootDir` is that same directory, so cwd is
+// the right base — and it is what the `existsSync` assertions below already
+// assume. Not `__dirname`: this suite runs as ESM (jest.config.cjs sets
+// `useESM`), where `__dirname` is not defined at all.
+const ROOT = process.cwd();
 
 const html = (markdown: string) =>
   renderToStaticMarkup(renderArticle(markdown, { components: stonedogArticleComponents }));
@@ -83,11 +94,44 @@ describe("the Panda include globs resolve to real files", () => {
   // rules, and the components still render with the class names. The page is
   // simply unstyled, with a green build. So the globs are asserted rather than
   // assumed — this is the only place that failure has a symptom.
-  it("finds stonedog-style's source where panda.config.ts looks for it", () => {
-    const hoisted = existsSync("../../node_modules/stonedog-style/src/index.ts");
-    const local = existsSync("node_modules/stonedog-style/src/index.ts");
+  //
+  // The globs are READ FROM panda.config.ts rather than restated here. An
+  // earlier version hardcoded the paths, which made it a test of the filesystem
+  // and not of the config: renaming the package in panda.config alone would
+  // leave this passing while Panda parsed nothing. The two can only drift if
+  // they are written twice, so they are written once.
+  const includes: string[] = pandaConfig.include ?? [];
 
-    expect(hoisted || local).toBe(true);
+  it("reads a non-empty include list from panda.config.ts", () => {
+    // Guards the guard. If the import ever yields `undefined` — a moved file, a
+    // changed export shape — every assertion below iterates an empty array and
+    // passes, and this suite goes quietly vacuous.
+    expect(includes.length).toBeGreaterThanOrEqual(2);
+  });
+
+  // The `node_modules` entries are held out and asserted as a PAIR below. Two
+  // locations are listed deliberately, because npm workspaces hoist and which
+  // one exists depends on the consuming tree — so either may legitimately match
+  // nothing. Running them through this case with an early `return` would print
+  // a passing test named after a glob it never checked, which is a worse lie
+  // than not listing it.
+  it.each(includes.filter((g) => !g.includes("node_modules")))(
+    "matches at least one file: %s",
+    (glob) => {
+      expect(globSync(glob, { cwd: ROOT }).length).toBeGreaterThan(0);
+    },
+  );
+
+  it("finds @stonedogcode/style's source in one of the two node_modules spots", () => {
+    // npm nests a SCOPED package one directory deeper —
+    // node_modules/@stonedogcode/style, not node_modules/stonedog-style — so
+    // this path moved when the package moved (NEH-482). Getting it wrong emits
+    // no error at all.
+    const nodeModuleGlobs = includes.filter((g) => g.includes("node_modules"));
+    expect(nodeModuleGlobs.length).toBeGreaterThan(0);
+
+    const matched = nodeModuleGlobs.flatMap((g) => globSync(g, { cwd: ROOT }));
+    expect(matched.length).toBeGreaterThan(0);
   });
 
   it("finds this package's own generated styled-system", () => {

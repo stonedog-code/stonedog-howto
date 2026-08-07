@@ -1,5 +1,5 @@
 {
-  "name": "stonedog-howto",
+  "name": "@stonedogcode/howto",
   "version": "0.1.1",
   "description": "A how-to documentation surface for applications: markdown articles that describe themselves in frontmatter, section manifests, per-article tables of contents, search, and access control supplied by the host.",
   "license": "Apache-2.0",
@@ -12,14 +12,14 @@
   "sideEffects": false,
   "//workspaces": "`demo` only, and it is private. The `files` list below ships src/ alone, so the demo travels with the repository and never with the tarball.",
   "workspaces": ["demo"],
-  "//exports": "This package ships TypeScript SOURCE, not a bundled dist/, for the same reason stonedog-style does: the React layer is styled with Panda CSS, which extracts styles by statically parsing source at the CONSUMER's build. A pre-bundled dist would emit class names the consumer's Panda never generated a stylesheet for. Consumers transpile us (Next.js: `transpilePackages: ['stonedog-howto']`) and add our src to their panda `include` globs.",
+  "//exports": "This package ships TypeScript SOURCE, not a bundled dist/, for the same reason stonedog-style does: the React layer is styled with Panda CSS, which extracts styles by statically parsing source at the CONSUMER's build. A pre-bundled dist would emit class names the consumer's Panda never generated a stylesheet for. Consumers transpile us (Next.js: `transpilePackages: ['@stonedogcode/howto']`) and add our src to their panda `include` globs.",
   "exports": {
     ".": "./src/index.ts",
     "./node": "./src/node/index.ts",
     "./styled": "./src/styled/index.ts",
     "./package.json": "./package.json"
   },
-  "//files": "The __tests__ exclusion is load-bearing, not tidiness. Consumers add `node_modules/stonedog-howto/src/**` to their Panda `include` globs, so anything shipped under src/ is statically parsed at THEIR build — and the tests import jest globals and render fixture markup. They also ship a test suite nobody can run to every consumer.",
+  "//files": "The __tests__ exclusion is load-bearing, not tidiness. Consumers add `node_modules/@stonedogcode/howto/src/**` to their Panda `include` globs, so anything shipped under src/ is statically parsed at THEIR build — and the tests import jest globals and render fixture markup. They also ship a test suite nobody can run to every consumer.",
   "files": [
     "src",
     "!src/**/__tests__/**",
@@ -30,8 +30,8 @@
   "scripts": {
     "type-check": "tsc --noEmit",
     "//dev": "The demo. Its own workspace, so one `npm install` at the root is enough and react resolves to a single hoisted copy — two Reacts in one tree fail at runtime with 'Invalid hook call', pointing at a component rather than at the install that caused it.",
-    "dev": "npm run dev --workspace stonedog-howto-demo",
-    "type-check:demo": "npm run type-check --workspace stonedog-howto-demo",
+    "dev": "npm run dev --workspace @stonedogcode/howto-demo",
+    "type-check:demo": "npm run type-check --workspace @stonedogcode/howto-demo",
     "lint": "eslint .",
     "//test": "Jest runs as ESM (see jest.config.cjs), which needs the VM modules flag.",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",

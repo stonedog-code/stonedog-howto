@@ -2,7 +2,7 @@
 # Copyright (C) 2026 StoneDogCode L.L.C.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Publish stonedog-howto to npm, end to end.
+# Publish @stonedogcode/howto to npm, end to end.
 #
 #   npm run publish:stonedog-howto
 #
@@ -20,8 +20,21 @@
 #
 # ## The traps specific to THIS package
 #
+# 0. **The name is SCOPED, and that is settled.** It was briefly renamed to the
+#    unscoped `stonedog-howto` on 2026-08-07 to match stonedog-style/theme/rbac,
+#    then reverted the same day when the decision went the other way: all five
+#    shared packages scope under @stonedogcode (NEH-482). The rename never
+#    reached the registry, so `stonedog-howto` does not exist and nothing
+#    depended on it. Do not redo it.
+#
+#    The alias is written in FOUR places — demo/vite.config.ts, demo/tsconfig,
+#    the root tsconfig, jest.config.cjs — and each tool reads only its own. The
+#    vite entries are anchored REGEXES, so a find-and-replace over the plain
+#    specifier misses them and the demo silently exercises the last published
+#    release instead of the working tree, with everything still building.
+#
 # 1. It ships TypeScript SOURCE under `src/`, and consumers add
-#    `node_modules/stonedog-howto/src/**` to their Panda `include` globs. So
+#    `node_modules/@stonedogcode/howto/src/**` to their Panda `include` globs. So
 #    anything shipped under src/ is statically parsed at the CONSUMER's build.
 #    `files: ["src"]` therefore shipped the entire test suite until it was
 #    caught — jest globals and fixture markup, parsed by every consumer. The
@@ -36,7 +49,7 @@
 #    consumer's component rather than at this manifest.
 set -euo pipefail
 
-PACKAGE_NAME="stonedog-howto"
+PACKAGE_NAME="@stonedogcode/howto"
 # Sanity floor for the tarball. Comfortably under the real count (22) so
 # ordinary growth does not trip it, far above what a `files`-misconfigured
 # package would produce (3: package.json, README, LICENSE).

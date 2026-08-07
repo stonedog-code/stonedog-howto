@@ -20,8 +20,8 @@ import {
   type HowToConfig,
   type HowToViewer,
   type ManifestSection,
-} from "stonedog-howto";
-import { loadArticles } from "stonedog-howto/node";
+} from "@stonedogcode/howto";
+import { loadArticles } from "@stonedogcode/howto/node";
 
 import { VIEWERS, type ViewerId } from "../shared/viewers";
 

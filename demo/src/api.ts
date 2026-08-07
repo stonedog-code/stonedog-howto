@@ -1,4 +1,4 @@
-import type { Manifest, ManifestSection, Article, SearchResult } from "stonedog-howto";
+import type { Manifest, ManifestSection, Article, SearchResult } from "@stonedogcode/howto";
 
 // Type-only, so nothing from the server module — least of all `node:fs`,
 // reached through the article loader — survives into the browser bundle.

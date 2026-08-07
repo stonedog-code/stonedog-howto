@@ -1,5 +1,5 @@
 /**
- * stonedog-howto — a how-to documentation surface for applications.
+ * @stonedogcode/howto — a how-to documentation surface for applications.
  *
  * Articles are markdown files that describe themselves in frontmatter. This
  * package turns a pile of them into an arranged, access-controlled, searchable

@@ -32,9 +32,9 @@ module.exports = {
     // They must agree, and each exists because the tool reading it knows
     // nothing of the other two. All three point at `src/`, which is what stops
     // the demo silently exercising the published 0.1.1 instead of this branch.
-    "^stonedog-howto$": "<rootDir>/src/index.ts",
-    "^stonedog-howto/node$": "<rootDir>/src/node/index.ts",
-    "^stonedog-howto/styled$": "<rootDir>/src/styled/index.ts",
+    "^@stonedogcode/howto$": "<rootDir>/src/index.ts",
+    "^@stonedogcode/howto/node$": "<rootDir>/src/node/index.ts",
+    "^@stonedogcode/howto/styled$": "<rootDir>/src/styled/index.ts",
   },
   transform: {
     "^.+\\.tsx?$": ["ts-jest", { useESM: true }],

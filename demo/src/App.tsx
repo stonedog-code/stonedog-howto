@@ -6,7 +6,7 @@ import {
   HowToSearch,
   type Article,
   type ManifestSection,
-} from "stonedog-howto";
+} from "@stonedogcode/howto";
 
 import { fetchHowTo, type DemoState, type ViewerId } from "./api";
 import { ViewerSwitcher } from "./ViewerSwitcher";
@@ -96,7 +96,7 @@ export function App(): ReactElement {
     <div className="layout">
       <header className="topbar">
         <div className="brand">
-          <strong>stonedog-howto</strong>
+          <strong>@stonedogcode/howto</strong>
           <span>demo</span>
         </div>
 

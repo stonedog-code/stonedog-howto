@@ -19,9 +19,9 @@
     "types": ["node", "vite/client"],
     "baseUrl": ".",
     "paths": {
-      "stonedog-howto": ["../src/index.ts"],
-      "stonedog-howto/node": ["../src/node/index.ts"],
-      "stonedog-howto/styled": ["../src/styled/index.ts"]
+      "@stonedogcode/howto": ["../src/index.ts"],
+      "@stonedogcode/howto/node": ["../src/node/index.ts"],
+      "@stonedogcode/howto/styled": ["../src/styled/index.ts"]
     }
   },
   "include": ["src", "server", "shared", "vite.config.ts"]

@@ -56,7 +56,7 @@ function sectionFor(relPath: string, rootSection: string): string {
  * it is one behaviour: the error names the file, and nothing is silently
  * skipped.
  *
- * Node-only, and behind its own entry point (`stonedog-howto/node`) so a browser
+ * Node-only, and behind its own entry point (`@stonedogcode/howto/node`) so a browser
  * bundle never pulls `node:fs` in through the package's main export.
  *
  * `sourcePath` is set to the path **relative to `root`**, not the absolute one.

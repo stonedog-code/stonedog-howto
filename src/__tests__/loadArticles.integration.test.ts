@@ -136,8 +136,8 @@ describe("the whole path, from disk to a filtered surface", () => {
     expect(billing?.articles.map((a) => a.meta.slug)).toEqual(["invoices-2026"]);
   });
 
-  it("shows a reader with no roles only the unrestricted articles", () => {
-    const filtered = filterManifest(manifest, roleSetViewer({ roles: [] }));
+  it("shows a plain Reader only the articles naming their role", () => {
+    const filtered = filterManifest(manifest, roleSetViewer({ roles: ["Reader"] }));
 
     expect([...filtered.bySlug.keys()].sort()).toEqual(["getting-started", "welcome"]);
     // Administration held only restricted articles, so the section is gone
@@ -146,7 +146,7 @@ describe("the whole path, from disk to a filtered surface", () => {
   });
 
   it("shows an Admin their own articles and still withholds the Owner one", () => {
-    const filtered = filterManifest(manifest, roleSetViewer({ roles: ["Admin"] }));
+    const filtered = filterManifest(manifest, roleSetViewer({ roles: ["Reader", "Admin"] }));
 
     expect([...filtered.bySlug.keys()].sort()).toEqual([
       "getting-started",

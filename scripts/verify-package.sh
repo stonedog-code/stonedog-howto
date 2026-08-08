@@ -52,15 +52,15 @@ JSON
 # resolves via the published `exports` map rather than the local file layout.
 cat > src/check.ts <<'TS'
 import {
-  parseArticle, buildManifest, filterManifest, roleSetViewer,
-  extractToc, buildSearchIndex, search,
+  parseArticle, buildManifest, filterManifest, mappedRoleViewer, roleSetViewer,
+  extractToc, buildSearchIndex, search, validateArticles,
   type Article, type HowToConfig, type HowToViewer,
 } from "@stonedogcode/howto";
 import { loadArticles } from "@stonedogcode/howto/node";
 
 const config: HowToConfig = { sections: [{ id: "general", title: "General" }] };
 const article: Article = parseArticle(
-  "---\ntitle: Welcome\nsection: general\n---\n\n## One\n\nx\n\n## Two\n\ny",
+  "---\ntitle: Welcome\nsection: general\nroles: [Admin]\n---\n\n## One\n\nx\n\n## Two\n\ny",
   { sourcePath: "welcome.md" },
 );
 const viewer: HowToViewer = roleSetViewer({ roles: ["Admin"] });
@@ -72,6 +72,35 @@ if (manifest.sections.length !== 1) throw new Error("manifest not built");
 if (results.length !== 1) throw new Error("search found nothing");
 if (extractToc(article.body).length !== 2) throw new Error("toc not extracted");
 if (typeof loadArticles !== "function") throw new Error("node entry point missing");
+
+// An article naming no audience entitles nobody, and is reported rather than
+// guessed at. Checked from an installed tarball because it is the package's
+// most consequential default: the version that got this wrong would publish
+// every article whose author forgot the field.
+const unfinished: Article = parseArticle(
+  "---\ntitle: Unfinished\nsection: general\n---\n\nx",
+  { sourcePath: "unfinished.md" },
+);
+const openManifest = buildManifest([article, unfinished], config);
+if (openManifest.bySlug.size !== 2) throw new Error("a warning must not stop the build");
+if (filterManifest(openManifest, viewer).bySlug.has("unfinished")) {
+  throw new Error("an article naming no roles must reach nobody by default");
+}
+const warned = validateArticles([article, unfinished], config);
+if (!warned.some((p) => p.kind === "missing-roles" && p.severity === "warning")) {
+  throw new Error("missing roles must be reported as a warning");
+}
+
+// The mapping viewer, exercised through the published exports — an export that
+// type-checks in this repo but never made it into `files` is the failure this
+// script exists to catch.
+const mapped = mappedRoleViewer({
+  viewerRoles: ["Editor"],
+  mapping: { Editor: ["Admin"] },
+});
+if (!mapped.canSee(["Admin"])) throw new Error("mapping did not grant");
+if (mapped.canSee(["Unmapped"])) throw new Error("an unmapped role must deny");
+if (mapped.canSee(undefined)) throw new Error("no roles must deny by default");
 
 console.log("package verified: exports resolve, types check, code runs");
 TS

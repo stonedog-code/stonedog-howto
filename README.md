@@ -51,9 +51,13 @@ closing delimiter is the body, and the body may be empty.
 | `slug` | no | string | the filename without its extension, **lowercased** | The article's identifier, unique across the whole set. Two articles sharing one is an error, not a last-one-wins. Must match `^[a-z0-9]+(-[a-z0-9]+)*$` — it appears in URLs. |
 | `order` | no | number | `0` | Rank within the section, ascending. Ties break on title, so equal ranks still come out in a stable order rather than in whatever order the filesystem offered. |
 | `summary` | no | string | — | One line under the title in listings and search results. Ranked below the title and above headings when searching. Blank is treated as absent. |
-| `roles` | no | string[] | — | Who may read it. See below. |
+| `roles` | **in practice**² | string[] | — | Who may read it. See below. |
 
 ¹ Unless `sectionFromDirectory` is on, which supplies it from the directory.
+
+² The parser accepts an article without it — and then every viewer this package
+ships refuses to show that article to anybody. See below; it is the field most
+worth getting right.
 
 The default slug is lowercased because filename case is a local convention and a
 slug is a URL. An explicit `slug` is still validated strictly against the pattern
@@ -70,9 +74,8 @@ frontmatter appears to say.
 `roles` is a **set**, not a level. The package never interprets a role name; it
 hands the list to the host's `canSee` and does as it is told.
 
-- **Omitted** — the article states no requirement, and the *viewer* decides
-  whether that means everyone or nobody. `roleSetViewer`'s `seesUnrestricted`
-  option is that decision, and it defaults to "everyone".
+- **Omitted** — the article entitles **nobody**, and every viewer this package
+  ships refuses it by default. See "Silence is not everyone" below.
 - **A list of names** — readable by a reader holding **any one** of them. It is
   a union, never an intersection: there is no way to express "Admin *and*
   Auditor" in the article, because a requirement that two roles must be held
@@ -83,14 +86,52 @@ hands the list to the host's `canSee` and does as it is told.
   one.
 - **An empty list** (`roles: []`) is **rejected**, naming the file. It would mean
   "no role may see this", which is never what an author intends, and its effect
-  — the article silently disappearing — is invisible once rendered. Omit the
-  field to leave the audience to the host.
+  — the article silently disappearing — is invisible once rendered.
 
 The names are the *host's* role names. Different applications name their roles
 differently and that is expected: the article is the right place for the
 requirement because the article is the thing being protected, and the host is
 the right place for the interpretation because the host is the thing that knows
 who is reading.
+
+### Silence is not "everyone"
+
+An article that omits `roles` is readable by **nobody**, by default, in every
+viewer this package ships.
+
+The tempting default is the opposite — no roles, no restriction — and it is
+wrong in a way that only ever shows up as a disclosure. An article naming no
+audience has not said "everyone"; it has said *nothing*, and by far the most
+common reason is that whoever wrote it forgot the field. Under a permissive
+default the one article nobody finished is the one article everybody can read.
+
+That failure is silent in the direction that matters. Nobody reports being shown
+too much, so the mistake survives review, survives release, and is found — if
+ever — by whoever it was supposed to be kept from. Denying inverts it: the
+article disappears, somebody asks where it went, and the frontmatter gets fixed.
+
+Find them before a reader does:
+
+```ts
+const problems = validateArticles(articles, config);
+const unfinished = problems.filter((p) => p.kind === "missing-roles");
+//   → [{ kind, severity: "warning", subject, message, sourcePaths: ["…md"] }]
+```
+
+A **warning**, not an error, so `buildManifest` still builds. Refusing to build
+over one incomplete article would take a hundred good ones offline with it,
+which is how a useful check ends up deleted by whoever needed a green build.
+Count them and show the count; an omission nobody counts is an omission nobody
+fixes.
+
+A host with a reader entitled to *fix* these articles can say so per reader:
+
+```ts
+roleSetViewer({ roles: reader.roles, unrestricted: reader.isOperator ? "allow" : "deny" })
+```
+
+which is how "only operators see unfinished articles" is expressed without this
+package ever learning what an operator is.
 
 ## See it running
 
@@ -175,14 +216,44 @@ Implement it against whatever authorisation you already have:
 
 ```ts
 const viewer: HowToViewer = {
-  canSee: (roles) => (roles ? roles.some((r) => membership.hasRole(r, orgId)) : true),
+  canSee: (roles) => (roles ? roles.some((r) => membership.hasRole(r, orgId)) : false),
 };
 
 const visible = filterManifest(manifest, viewer);
 ```
 
-A `roleSetViewer({ roles })` helper is included for the plain case where an
-article's `roles` list is simply checked against the roles the reader holds.
+Two helpers cover the common cases.
+
+**`roleSetViewer({ roles })`** — the plain case: an article's `roles` list
+checked against the roles the reader holds, one vocabulary throughout.
+
+**`mappedRoleViewer({ viewerRoles, mapping })`** — for when the reader's roles
+and the articles' roles are **different vocabularies**, which is what happens as
+soon as you present articles that were written somewhere else:
+
+```ts
+mappedRoleViewer({
+  viewerRoles: ["Editor"],
+  mapping: { Editor: ["Contributor", "Reviewer"], Owner: "*" },
+});
+```
+
+The names in an article's `roles` belong to whatever wrote it; the names a
+reader holds belong to whoever is presenting it. The two coincide only by
+accident — and where they coincide by accident they are at their most dangerous,
+one application's `Admin` silently meaning another's. So there is deliberately
+**no** "fall back to matching names directly" mode: it is convenient exactly
+until two vocabularies share a word.
+
+**Absence denies.** A role the mapping does not mention grants nothing; a role
+name in an article that no entry lists is readable by nobody. This is what makes
+a mapping safe to get wrong — a mistake *hides* articles, and the reader who
+cannot find one complains. The alternative, where an unrecognised name simply
+fails to restrict anything, *reveals* them, and nobody complains about being
+shown too much. Only one of those two failures reports itself.
+
+Both helpers default `unrestricted` to `"deny"`, per "Silence is not everyone"
+above.
 
 **Filter on the server, before the manifest reaches the browser.** Filtering only
 in the UI ships every article's title, summary and body to a reader who may not

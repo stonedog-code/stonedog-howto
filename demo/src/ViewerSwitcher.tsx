@@ -55,7 +55,7 @@ export function ViewerSwitcher({
           onChange={(event) => onToggleUnrestricted(event.target.checked)}
         />
         <span>
-          Articles with no <code>roles</code> are readable
+          Show articles that name no <code>roles</code>
         </span>
       </label>
 

@@ -35,7 +35,9 @@ const config: HowToConfig = {
 };
 
 const articles = [
-  article("welcome", "Welcome", "basics", "## Start here\n\nProse.\n\n## Next\n\nMore."),
+  article("welcome", "Welcome", "basics", "## Start here\n\nProse.\n\n## Next\n\nMore.", [
+    "Reader",
+  ]),
   article("audit", "Audit log", "security", "## Reading the log\n\nProse.", ["Owner"]),
 ];
 
@@ -118,7 +120,7 @@ describe("HowToNav", () => {
     // asserts the composition a host is meant to use: filter on the server, then
     // render. A restricted article must be absent from the markup entirely, not
     // merely hidden.
-    const filtered = filterManifest(manifest, roleSetViewer({ roles: [] }));
+    const filtered = filterManifest(manifest, roleSetViewer({ roles: ["Reader"] }));
     const out = renderToStaticMarkup(<HowToNav manifest={filtered} hrefFor={hrefFor} />);
 
     expect(out).toContain("Welcome");
@@ -142,7 +144,7 @@ describe("HowToSearch", () => {
   });
 
   it("lists results and deep-links the headings that matched", () => {
-    const results = search(index, "start", roleSetViewer({ roles: [] }));
+    const results = search(index, "start", roleSetViewer({ roles: ["Reader"] }));
     const out = renderToStaticMarkup(
       <HowToSearch value="start" onChange={noop} results={results} hrefFor={hrefFor} />,
     );
@@ -154,7 +156,7 @@ describe("HowToSearch", () => {
   it("says only that nothing matched, never why", () => {
     // "No articles match" is complete. Anything about indexes, roles or
     // permissions would tell a reader that something exists they cannot see.
-    const results = search(index, "reading", roleSetViewer({ roles: [] }));
+    const results = search(index, "reading", roleSetViewer({ roles: ["Reader"] }));
     const out = renderToStaticMarkup(
       <HowToSearch value="reading" onChange={noop} results={results} hrefFor={hrefFor} />,
     );
@@ -164,7 +166,7 @@ describe("HowToSearch", () => {
   });
 
   it("finds the restricted article for a reader who holds the role", () => {
-    const results = search(index, "reading", roleSetViewer({ roles: ["Owner"] }));
+    const results = search(index, "reading", roleSetViewer({ roles: ["Reader", "Owner"] }));
     const out = renderToStaticMarkup(
       <HowToSearch value="reading" onChange={noop} results={results} hrefFor={hrefFor} />,
     );

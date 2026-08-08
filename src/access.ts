@@ -4,15 +4,36 @@ import type { Article, HowToViewer } from "./types";
 /** A viewer that sees everything. For development and for single-audience sites. */
 export const seesEverything: HowToViewer = { canSee: () => true };
 
+/**
+ * What a viewer does with an article that declares no `roles` at all.
+ *
+ * **Defaults to `deny` everywhere in this package**, and the default is the
+ * whole point. An article naming no audience has not said "everyone" — it has
+ * said nothing, usually because whoever wrote it forgot. Treating silence as
+ * the widest possible audience means the one article nobody finished is the one
+ * article everybody can read.
+ *
+ * `allow` exists for the host that genuinely has a reader entitled to see
+ * unfinished articles — typically whoever is expected to fix them. That is a
+ * decision about a *person*, so the host makes it per reader:
+ *
+ * ```ts
+ * unrestricted: viewerIsOperator ? "allow" : "deny"
+ * ```
+ *
+ * which is how "only operators see articles missing their roles" is expressed
+ * without this package ever learning what an operator is.
+ */
+export type UnrestrictedPolicy = "deny" | "allow";
+
 export interface RoleSetViewerOptions {
   /** The role names this reader holds. */
   roles: string[];
   /**
-   * Whether this reader may also see articles that declare no `roles` at all.
-   * Defaults to true. Set false for a reader who should see only what is
-   * explicitly granted to one of their roles.
+   * What this reader may do with an article that declares no `roles`.
+   * Defaults to `"deny"`.
    */
-  seesUnrestricted?: boolean;
+  unrestricted?: UnrestrictedPolicy;
 }
 
 /**
@@ -27,12 +48,99 @@ export interface RoleSetViewerOptions {
  */
 export function roleSetViewer(options: RoleSetViewerOptions): HowToViewer {
   const held = new Set(options.roles);
-  const seesUnrestricted = options.seesUnrestricted ?? true;
+  const unrestricted = options.unrestricted ?? "deny";
 
   return {
     canSee(requiredRoles) {
-      if (requiredRoles === undefined) return seesUnrestricted;
+      if (requiredRoles === undefined) return unrestricted === "allow";
       return requiredRoles.some((role) => held.has(role));
+    },
+  };
+}
+
+/**
+ * Permitted article roles, per role the reader holds.
+ *
+ * `"*"` grants every role name the articles use — for a reader trusted with a
+ * whole body of documentation, where listing the names would mean editing this
+ * mapping every time somebody adds one.
+ */
+export type RoleMapping = Readonly<Record<string, readonly string[] | "*">>;
+
+export interface MappedRoleViewerOptions {
+  /** The role names this reader holds, in the *reader's* vocabulary. */
+  viewerRoles: readonly string[];
+  /** What each of those roles is permitted to read, in the *articles'*. */
+  mapping: RoleMapping;
+  /**
+   * What this reader may do with an article that declares no `roles`.
+   * Defaults to `"deny"`.
+   */
+  unrestricted?: UnrestrictedPolicy;
+}
+
+/**
+ * A viewer for the case where the reader's roles and the articles' roles are
+ * **different vocabularies**, joined by an explicit mapping.
+ *
+ * This is what a host needs when it presents articles that were written
+ * somewhere else. The names in an article's `roles` belong to whatever wrote
+ * it, and the names a reader holds belong to whoever is presenting it; the two
+ * coincide only by accident, and where they coincide by accident they are at
+ * their most dangerous — one application's `Admin` silently meaning another's.
+ *
+ * ```ts
+ * mappedRoleViewer({
+ *   viewerRoles: ["Editor"],
+ *   mapping: { Editor: ["Contributor", "Reviewer"], Owner: "*" },
+ * });
+ * ```
+ *
+ * ## Absence denies, and that is the load-bearing property
+ *
+ * A role the mapping does not mention grants nothing. A role name in an article
+ * that no mapping entry lists is readable by nobody.
+ *
+ * This is what makes the mapping safe to get wrong. A mistake in a mapping
+ * *hides* articles, which the reader who cannot find one complains about; the
+ * alternative — where an unrecognised name simply fails to restrict anything —
+ * *reveals* them, and nobody complains about being shown too much. Only one of
+ * those two failures reports itself, so the design points every mistake at that
+ * one.
+ *
+ * For the same reason there is no "fall back to matching names directly" mode.
+ * It would be convenient exactly until two vocabularies shared a word.
+ */
+export function mappedRoleViewer(options: MappedRoleViewerOptions): HowToViewer {
+  const unrestricted = options.unrestricted ?? "deny";
+
+  let seesEveryRole = false;
+  const permitted = new Set<string>();
+
+  for (const held of options.viewerRoles) {
+    // `Object.hasOwn` rather than a bare lookup: a mapping is host data, often
+    // from a database, and a role named `constructor` or `toString` would
+    // otherwise resolve to something off Object.prototype and be treated as a
+    // grant.
+    if (!Object.hasOwn(options.mapping, held)) continue; // absence denies
+    const granted = options.mapping[held];
+    if (granted === undefined) continue;
+    if (granted === "*") {
+      seesEveryRole = true;
+      continue;
+    }
+    for (const role of granted) permitted.add(role);
+  }
+
+  return {
+    canSee(requiredRoles) {
+      // Deliberately checked before `*`. An article with no roles has no role
+      // to be granted — its problem is that it is unfinished, not that it is
+      // exclusive — so "may read every role" must not quietly also mean "may
+      // read the ones nobody classified".
+      if (requiredRoles === undefined) return unrestricted === "allow";
+      if (seesEveryRole) return true;
+      return requiredRoles.some((role) => permitted.has(role));
     },
   };
 }

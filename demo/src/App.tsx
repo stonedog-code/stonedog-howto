@@ -30,7 +30,9 @@ function firstInNavOrder(sections: ManifestSection[]): Article | null {
 
 export function App(): ReactElement {
   const [viewer, setViewer] = useState<ViewerId>("admin");
-  const [seesUnrestricted, setSeesUnrestricted] = useState(true);
+  // Off, matching the package's own default: an article that names no audience
+  // is readable by nobody until a host deliberately decides otherwise.
+  const [seesUnrestricted, setSeesUnrestricted] = useState(false);
   const [query, setQuery] = useState("");
   const [slug, setSlug] = useState(slugFromHash);
   const [state, setState] = useState<DemoState | null>(null);
@@ -116,6 +118,14 @@ export function App(): ReactElement {
         . The server sent <strong>{payload.stats.visible}</strong> of{" "}
         <strong>{payload.stats.total}</strong> articles
         {hidden > 0 ? ` — the other ${hidden} never left it.` : "."}
+        {payload.stats.missingRoles > 0 ? (
+          <>
+            {" "}
+            <strong>{payload.stats.missingRoles}</strong>{" "}
+            {payload.stats.missingRoles === 1 ? "article names" : "articles name"}{" "}
+            no <code>roles</code> at all.
+          </>
+        ) : null}
       </p>
 
       <div className="body">

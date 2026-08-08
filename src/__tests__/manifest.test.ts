@@ -2,12 +2,24 @@ import { ManifestError } from "../errors";
 import { buildManifest, validateArticles } from "../manifest";
 import type { Article, HowToConfig } from "../types";
 
+/**
+ * A well-formed article. Declares `roles`, because every article should — a
+ * fixture omitting it now raises a `missing-roles` warning, which would then
+ * turn up in tests that are about something else entirely.
+ */
 const article = (
   slug: string,
   section: string,
   extra: Partial<Article["meta"]> = {},
 ): Article => ({
-  meta: { title: slug, slug, section, order: 0, ...extra },
+  meta: { title: slug, slug, section, order: 0, roles: ["Reader"], ...extra },
+  body: "Body.",
+  sourcePath: `articles/${slug}.md`,
+});
+
+/** An article naming no audience — what `missing-roles` is about. */
+const articleWithoutRoles = (slug: string, section: string): Article => ({
+  meta: { title: slug, slug, section, order: 0 },
   body: "Body.",
   sourcePath: `articles/${slug}.md`,
 });
@@ -110,5 +122,81 @@ describe("buildManifest", () => {
       config,
     );
     expect(problems).toHaveLength(2);
+  });
+});
+
+describe("missing roles", () => {
+  const withRoles = (slug: string) => article(slug, "getting-started");
+
+  it("reports an article that declares no roles, naming its file", () => {
+    const problems = validateArticles(
+      [articleWithoutRoles("orphan", "getting-started")],
+      config,
+    );
+
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toMatchObject({
+      kind: "missing-roles",
+      severity: "warning",
+      subject: "orphan",
+      sourcePaths: ["articles/orphan.md"],
+    });
+  });
+
+  it("says nothing about an article that declares roles", () => {
+    expect(validateArticles([withRoles("welcome")], config)).toEqual([]);
+  });
+
+  // An empty `roles` list is rejected at parse time, so it never reaches here.
+  // What does reach here is a list with entries, and that is not a problem.
+  it("does not confuse a declared role list with an absent one", () => {
+    const problems = validateArticles(
+      [article("scoped", "getting-started", { roles: ["Owner", "Auditor"] })],
+      config,
+    );
+    expect(problems).toEqual([]);
+  });
+
+  // The whole reason severity exists. Refusing to build over an unfinished
+  // article would take every good article offline with it, which is how a
+  // useful check gets deleted by whoever needed a green build.
+  it("still builds the manifest, placing the article normally", () => {
+    const manifest = buildManifest(
+      [articleWithoutRoles("orphan", "getting-started"), withRoles("welcome")],
+      config,
+    );
+
+    expect(manifest.bySlug.has("orphan")).toBe(true);
+    expect(manifest.sections[0]?.articles.map((a) => a.meta.slug)).toEqual([
+      "orphan",
+      "welcome",
+    ]);
+  });
+
+  // ...but a real error still stops it, alongside the warning.
+  it("throws on an error even when a warning is present, reporting only the error", () => {
+    let caught: ManifestError | undefined;
+    try {
+      buildManifest([articleWithoutRoles("orphan", "does-not-exist")], config);
+    } catch (error) {
+      caught = error as ManifestError;
+    }
+
+    expect(caught).toBeInstanceOf(ManifestError);
+    expect(caught?.problems.map((p) => p.kind)).toEqual(["unknown-section"]);
+    expect(caught?.message).not.toContain("missing-roles");
+  });
+
+  it("counts them across a set, which is what a host reports", () => {
+    const problems = validateArticles(
+      [
+        articleWithoutRoles("one", "getting-started"),
+        articleWithoutRoles("two", "getting-started"),
+        withRoles("three"),
+      ],
+      config,
+    );
+
+    expect(problems.filter((p) => p.kind === "missing-roles")).toHaveLength(2);
   });
 });

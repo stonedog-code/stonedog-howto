@@ -19,7 +19,9 @@ import { buildManifest } from "../manifest";
 function payloadFor(viewer: (typeof VIEWER_IDS)[number], overrides: { unrestricted?: boolean } = {}) {
   return buildPayload({
     viewerId: viewer,
-    seesUnrestricted: overrides.unrestricted ?? true,
+    // Defaults to false, matching the package's own default and the demo's
+    // initial state: an article naming no audience is readable by nobody.
+    seesUnrestricted: overrides.unrestricted ?? false,
     query: "",
   });
 }
@@ -31,7 +33,7 @@ describe("the demo's articles", () => {
     // Adding an article to a directory nobody added to `config.sections` is the
     // easy mistake, and this is where it surfaces.
     const manifest = buildManifest(readArticles(), config);
-    expect(manifest.bySlug.size).toBe(7);
+    expect(manifest.bySlug.size).toBe(8);
   });
 
   it("takes each article's section from its directory", () => {
@@ -88,13 +90,32 @@ describe("what each viewer is sent", () => {
     expect(administration?.children[0]?.articleSlugs).toEqual(["invoices"]);
   });
 
-  it("hides the unrestricted articles when the host says omission grants nothing", () => {
-    // `seesUnrestricted: false` — a Guest then sees only the one article that
-    // names `Guest` explicitly, not the four that name nobody.
-    const guest = payloadFor("guest", { unrestricted: false });
+  it("hides the article naming no roles from everyone, including an Admin", () => {
+    // The demo carries exactly one such article, deliberately. Under the
+    // default policy nobody can open it — not even the most privileged viewer,
+    // because it entitles nobody rather than entitling somebody senior.
+    for (const id of VIEWER_IDS) {
+      const slugs = payloadFor(id).articles.map((a) => a.slug);
+      expect(slugs).not.toContain("an-article-that-forgot-its-roles");
+    }
+  });
 
-    expect(guest.stats.visible).toBe(1);
-    expect(guest.articles.map((a) => a.slug)).toEqual(["searching"]);
+  it("reveals it only when the host opts in, and says so in the stats", () => {
+    const before = payloadFor("guest");
+    const after = payloadFor("guest", { unrestricted: true });
+
+    expect(after.stats.visible).toBe(before.stats.visible + 1);
+    expect(after.articles.map((a) => a.slug)).toContain(
+      "an-article-that-forgot-its-roles",
+    );
+  });
+
+  it("counts the articles missing roles regardless of who is looking", () => {
+    // The count is a property of the content, not of the reader — a Guest who
+    // cannot open the article is still told one exists to be fixed.
+    for (const id of VIEWER_IDS) {
+      expect(payloadFor(id).stats.missingRoles).toBe(1);
+    }
   });
 
   it("never returns a search result for an article the viewer may not open", () => {

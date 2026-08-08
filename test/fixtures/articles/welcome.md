@@ -2,6 +2,7 @@
 title: Welcome
 summary: What this documentation covers.
 order: 10
+roles: [Reader]
 ---
 
 ## Start here

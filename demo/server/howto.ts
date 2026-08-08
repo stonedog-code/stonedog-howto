@@ -16,6 +16,7 @@ import {
   roleSetViewer,
   search,
   extractToc,
+  validateArticles,
   type Article,
   type HowToConfig,
   type HowToViewer,
@@ -70,7 +71,12 @@ export interface HowToPayload {
   articles: PayloadArticle[];
   results: PayloadResult[] | null;
   /** Diagnostics for the demo's own explanatory panel. */
-  stats: { total: number; visible: number };
+  stats: {
+    total: number;
+    visible: number;
+    /** Articles declaring no `roles` — a count of unfinished frontmatter. */
+    missingRoles: number;
+  };
 }
 
 export interface PayloadSection {
@@ -136,12 +142,22 @@ export function buildPayload({
   // flattening that to a list of names is where privilege leaks between scopes.
   const viewer: HowToViewer = roleSetViewer({
     roles: demoViewer.roles,
-    seesUnrestricted,
+    // The package defaults this to "deny". The switch is here so you can watch
+    // what the other setting does — an article nobody classified becoming
+    // readable by everyone — which is the failure the default prevents.
+    unrestricted: seesUnrestricted ? "allow" : "deny",
   });
 
   const articles = readArticles();
   const manifest = buildManifest(articles, config);
   const visible = filterManifest(manifest, viewer);
+
+  // Warnings, not errors: `buildManifest` above built this set successfully and
+  // an article missing its `roles` is in it. Surfacing the count is the point —
+  // an omission nobody counts is an omission nobody fixes.
+  const missingRoles = validateArticles(articles, config).filter(
+    (problem) => problem.kind === "missing-roles",
+  );
 
   // Built over the *unfiltered* set and handed the viewer, because `search`
   // filters before it matches. Filtering afterwards would let result counts and
@@ -162,7 +178,11 @@ export function buildPayload({
     sections: visible.sections.map(toPayloadSection),
     articles: [...visible.bySlug.values()].map(toPayloadArticle),
     results,
-    stats: { total: articles.length, visible: visible.bySlug.size },
+    stats: {
+      total: articles.length,
+      visible: visible.bySlug.size,
+      missingRoles: missingRoles.length,
+    },
   };
 }
 

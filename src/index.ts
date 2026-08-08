@@ -9,16 +9,23 @@
 export { parseArticle, type ParseArticleOptions } from "./article";
 export {
   filterManifest,
+  mappedRoleViewer,
   roleSetViewer,
   seesEverything,
   visibleArticles,
+  type MappedRoleViewerOptions,
+  type RoleMapping,
   type RoleSetViewerOptions,
+  type UnrestrictedPolicy,
 } from "./access";
 export {
   ArticleParseError,
   HowToError,
   ManifestError,
+  manifestErrors,
+  manifestWarnings,
   type ManifestProblem,
+  type ManifestProblemSeverity,
 } from "./errors";
 export { splitFrontmatter, type SplitDocument } from "./frontmatter";
 export {

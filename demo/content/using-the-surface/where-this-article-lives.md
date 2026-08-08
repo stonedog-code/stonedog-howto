@@ -3,6 +3,7 @@ title: A file that overrides its directory
 section: getting-started
 order: 30
 summary: This file sits in one directory and appears under another, on purpose.
+roles: [Guest, User, Admin]
 ---
 
 On disk this file is `content/using-the-surface/where-this-article-lives.md`.

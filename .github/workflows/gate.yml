@@ -60,3 +60,37 @@ jobs:
           typed=$(npx tsc --noEmit --listFiles | grep -c "^$PWD/src/" || true)
           echo "tsc included $typed files under src/"
           test "$typed" -ge 10
+
+  # Separate job so a lint or unit failure reports in ~1 min without waiting on
+  # a browser download and a Vite build. The E2E tier is the only one that can
+  # see the three things it asserts — see test/e2e/howto-surface.spec.ts.
+  e2e:
+    name: e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # `--with-deps` because the runner has none of the browser's shared
+      # libraries; chromium alone is enough and pulling all three browsers
+      # roughly triples this step for no coverage.
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm run test:e2e
+
+      # The report is the only way to read a failure after the fact — `list`
+      # scrolls past in a log, and `trace: retain-on-failure` produces traces
+      # that need the report to reach.
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

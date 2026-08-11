@@ -5,3 +5,7 @@ styled-system/
 *.log
 .DS_Store
 demo/dist/
+
+# Playwright (E2E tier, NEH-440)
+playwright-report/
+test-results/

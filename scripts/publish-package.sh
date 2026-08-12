@@ -23,7 +23,7 @@
 # 0. **The name is SCOPED, and that is settled.** It was briefly renamed to the
 #    unscoped `stonedog-howto` on 2026-08-07 to match the then-unscoped style/theme/rbac,
 #    then reverted the same day when the decision went the other way: all five
-#    shared packages scope under @stonedogcode (NEH-482). The rename never
+#    shared packages scope under @stonedogcode. The rename never
 #    reached the registry, so `stonedog-howto` does not exist and nothing
 #    depended on it. Do not redo it.
 #
@@ -126,7 +126,7 @@ fi
 # two diverge exactly when a manifest change has just been pulled — which is
 # precisely when someone is about to publish.
 #
-# stonedog-howto 0.1.2 hit this (NEH-497). The checkout was clean, on main and
+# stonedog-howto 0.1.2 hit this, on 2026-08-07. The checkout was clean, on main and
 # current, so the script reported readiness in as many words — but `npm install`
 # had never run after the pull that renamed the style dependency. The old
 # unscoped package was still on disk and the scoped one absent, and Panda's

@@ -1,6 +1,6 @@
 {
   "name": "@stonedogcode/howto",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A how-to documentation surface for applications: markdown articles that describe themselves in frontmatter, section manifests, per-article tables of contents, search, and access control supplied by the host.",
   "license": "Apache-2.0",
   "author": "StoneDogCode L.L.C.",

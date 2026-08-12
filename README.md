@@ -65,9 +65,62 @@ above; only the bare-filename default is forgiving. Two filenames differing only
 in case collapse to one slug, and that is reported as a duplicate naming both
 files rather than silently losing one.
 
-**Keys the package does not know are ignored, not rejected.** A typo'd `sumary`
-does nothing, quietly. Worth knowing when an article is not behaving as its
-frontmatter appears to say.
+### Unknown keys are rejected
+
+**A key this package does not define is an error, naming the file and the key.**
+
+```
+articles/features/notes.md: unknown frontmatter key `sumary` — did you mean
+`summary`? Host-specific metadata goes under an `x-` prefix.
+```
+
+Until 0.3.0 they were ignored, quietly. That is the failure this whole design
+exists to avoid, reintroduced inside the answer to it: three of the six fields
+break invisibly when misspelled, and one of the three breaks *towards
+disclosure*.
+
+| Misspelled | What used to happen |
+| --- | --- |
+| `sumary` | no summary anywhere — looks like an article whose author wrote none |
+| `oder` | rank falls back to `0`, so the article jumps to the top of its section |
+| `role` / `Roles` | **the article is readable by everyone** |
+
+An author who writes `role: [Admin]` has stated an audience. Accepting the file
+and publishing it to everybody is the one outcome they cannot detect, because
+nobody reports being shown too much.
+
+The error suggests the intended key when one is close enough, and lists the
+known keys when nothing is. A wrong suggestion is worse than none — it invites a
+second wrong edit — so the threshold is deliberately tight.
+
+**Host metadata goes under an `x-` prefix**, and is ignored:
+
+```yaml
+---
+title: Inviting a teammate
+section: workspace
+roles: [Admin]
+x-owner: platform-team      # yours; this package neither reads nor validates it
+x-review-due: 2027-01-01
+---
+```
+
+The prefix is what keeps the check meaningful. Allowing arbitrary unknown keys
+would let `sumary` straight back through; reserving a namespace catches typos in
+the fields this package owns while leaving the host somewhere to put its own.
+Their values never reach `ArticleMeta` — reading them would make the host's
+schema this package's problem.
+
+#### Upgrading from 0.2.x
+
+Strictly a breaking change, though it was measured against the only live article
+set — 106 articles, using exactly `title`, `section`, `order` and `roles` and
+nothing else — before being made the default rather than an opt-in flag. An
+opt-in would have left the `roles` disclosure live in the one place it could
+already happen, which is the wrong way round for a defect of that shape.
+
+If you carry extra keys, rename them with an `x-` prefix. The build tells you
+which and where.
 
 ### `roles`, precisely
 

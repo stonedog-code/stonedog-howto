@@ -2,6 +2,8 @@ import type { ReactElement } from "react";
 
 import type { TocEntry } from "../types";
 
+import { controlTapTarget } from "./tapTarget";
+
 export interface ArticleTocProps {
   entries: TocEntry[];
   /** Accessible name for the navigation landmark. */
@@ -41,7 +43,11 @@ export function ArticleToc({
       <ol>
         {entries.map((entry) => (
           <li key={entry.id} data-depth={entry.depth - shallowest}>
-            <a href={hrefFor(entry)}>{entry.text}</a>
+            {/* A contents entry is the whole of its row and navigates the
+                page, so it is a control and carries the floor (NEH-874). */}
+            <a href={hrefFor(entry)} style={controlTapTarget}>
+              {entry.text}
+            </a>
           </li>
         ))}
       </ol>

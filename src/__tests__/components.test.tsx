@@ -174,3 +174,59 @@ describe("HowToSearch", () => {
     expect(out).toContain('href="/how-to/audit"');
   });
 });
+
+/**
+ * NEH-874 — a tripwire, NOT a measurement.
+ *
+ * This tier cannot measure anything: jsdom has no layout engine, every box
+ * reports zero, and `renderToStaticMarkup` does not even reach a DOM. What it
+ * can say is whether the floor was declared, which is enough to catch the one
+ * regression that costs the most — somebody deleting the `style` prop while
+ * tidying, in a repo whose browser tier runs in a separate CI job.
+ *
+ * The real guard is `test/e2e/tap-targets.spec.ts`, which measures the rendered
+ * boxes at two viewports. Reading a green run here as "the tap targets are fine"
+ * is exactly the mistake the E2E tier exists to prevent.
+ */
+describe("controls declare the 48px tap-target floor (NEH-874)", () => {
+  const floorIsDeclared = (markup: string, occurrences: number): void => {
+    // `min-height:48px` — React serialises the style object without spaces.
+    const matches = markup.match(/min-height:48px/g) ?? [];
+    expect(matches).toHaveLength(occurrences);
+    // A floor on an inline box does nothing at all, so the display matters as
+    // much as the height.
+    expect(markup).not.toMatch(/display:inline;/);
+  };
+
+  it("on every navigation link", () => {
+    const manifest = buildManifest(articles, config);
+    const out = renderToStaticMarkup(<HowToNav manifest={manifest} hrefFor={hrefFor} />);
+
+    floorIsDeclared(out, 2);
+    expect(out).toContain("display:flex");
+  });
+
+  it("on every contents entry", () => {
+    const out = renderToStaticMarkup(
+      <ArticleToc
+        entries={[
+          { id: "start-here", text: "Start here", depth: 2 },
+          { id: "next", text: "Next", depth: 2 },
+        ]}
+      />,
+    );
+
+    floorIsDeclared(out, 2);
+  });
+
+  it("on the search box and on every result", () => {
+    const index = buildSearchIndex(articles);
+    const results = search(index, "reading", roleSetViewer({ roles: ["Reader", "Owner"] }));
+    const out = renderToStaticMarkup(
+      <HowToSearch value="reading" onChange={() => {}} results={results} hrefFor={hrefFor} />,
+    );
+
+    // The input, the one result's title, and its one matched heading.
+    floorIsDeclared(out, 3);
+  });
+});

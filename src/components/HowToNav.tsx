@@ -3,6 +3,8 @@ import type { ReactElement } from "react";
 import type { Manifest, ManifestSection } from "../manifest";
 import type { Article } from "../types";
 
+import { controlTapTarget } from "./tapTarget";
+
 export interface HowToNavProps {
   /**
    * The manifest to render.
@@ -41,6 +43,11 @@ function SectionList({
               <li key={article.meta.slug}>
                 <a
                   href={hrefFor(article)}
+                  // These are the page's navigation and the sole content of
+                  // their row, so they are controls, not in-sentence links —
+                  // the WCAG 2.5.5 carve-out for prose does not reach them and
+                  // they carry the 48px floor (NEH-874).
+                  style={controlTapTarget}
                   // `aria-current="page"` rather than a class alone: the styling
                   // says which entry is current to someone who can see it, and
                   // this says it to everyone else.

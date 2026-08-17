@@ -15,7 +15,9 @@ here is registered in a central list: each article says what it is called, where
 it belongs, and who may read it, in its own frontmatter.
 
 The demo's dev server reads `demo/content`, arranges it, and filters it for the
-viewer you have chosen — then sends the result to this page.
+viewer you have chosen — then sends the result to this page. The
+[package README](https://github.com/stonedog-code/stonedog-howto#readme)
+describes the same arrangement without the running example.
 
 ## The three viewers
 

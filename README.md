@@ -385,6 +385,31 @@ render what they are handed, deliberately: the filtering has to happen on the
 server, where a client cannot decline to run it. Compose them as
 `filterManifest` → render, and `search(index, query, viewer)` → render.
 
+### The one thing these components style for you
+
+Every control they render — navigation links, contents entries, search results,
+and the search box — carries a **48×48 px minimum** as an inline `style`. That
+is the one opinion the core package holds, and it is held on purpose:
+
+- **It is an accessibility floor, not a look.** 48×48 is stricter than WCAG
+  2.5.5's 44×44. A 22 px navigation link is hard to hit with a thumb, and a
+  navigation link you miss opens the wrong article.
+- **It is a floor, so your styling still wins.** `min-height`/`min-width` only
+  push a box up. Padding, font size, a taller row — you get what you ask for.
+  What you cannot do is style these links back down to 22 px, which is the
+  point.
+- **An inline style rather than a class**, because a class would need CSS behind
+  it. Panda extracts styles by parsing source at *your* build, so a class emitted
+  here has rules only if your `include` globs happen to reach this package — and
+  a glob that matches nothing fails silently. An inline style cannot miss.
+- **A link inside a sentence is untouched.** Article body links keep flowing with
+  the prose, which is what WCAG's own carve-out is for. The rule is: sole content
+  of its container → control; prose beside it → text.
+
+Nav links use `display: flex` so they fill their row, which is both the larger
+target and what a sidebar link is usually styled as anyway. In a flex or grid
+parent — a horizontal nav — they lay out exactly as `inline-flex` would.
+
 ## The `@stonedogcode/style` presentation layer
 
 A ready-made component map is available from a **separate entry point**:

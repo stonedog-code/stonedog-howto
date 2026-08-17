@@ -17,6 +17,19 @@ import { defineConfig } from "@playwright/test";
  *    and integration tiers assert the payload; only a browser can say what was
  *    actually painted.
  */
+/**
+ * The port, overridable.
+ *
+ * 5199 stays the default so an unqualified `npm run test:e2e` behaves exactly as
+ * before. The override exists because `--strictPort` turns a collision into a
+ * hard failure by design, and on a machine running several of these projects at
+ * once the collision is with something entirely unrelated — at which point the
+ * only way to run the suite is to stop the other app. An env var is cheaper than
+ * that, and it cannot drift, because both the server and the baseURL read it.
+ */
+const PORT = process.env.HOWTO_E2E_PORT ?? "5199";
+const ORIGIN = `http://localhost:${PORT}`;
+
 export default defineConfig({
   testDir: "./test/e2e",
   // A retry hides a flake, and a flaky access-control test is a finding.
@@ -24,7 +37,7 @@ export default defineConfig({
   timeout: 30_000,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : [["list"]],
   use: {
-    baseURL: "http://localhost:5199",
+    baseURL: ORIGIN,
     trace: "retain-on-failure",
   },
   webServer: {
@@ -45,8 +58,8 @@ export default defineConfig({
     // `npm run --workspace` call, so `npm run dev -- --port …` is swallowed by
     // the OUTER npm ("Unknown cli config --port") and vite never sees it — the
     // args vanish silently and the server comes up on the default port.
-    command: "npm run dev --workspace @stonedogcode/howto-demo -- --port 5199 --strictPort",
-    url: "http://localhost:5199",
+    command: `npm run dev --workspace @stonedogcode/howto-demo -- --port ${PORT} --strictPort`,
+    url: ORIGIN,
     reuseExistingServer: false,
     timeout: 120_000,
     stdout: "ignore",

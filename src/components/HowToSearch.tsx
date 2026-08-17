@@ -3,6 +3,8 @@ import type { ReactElement } from "react";
 import type { SearchResult } from "../search";
 import type { Article } from "../types";
 
+import { controlTapTarget, inputTapTarget } from "./tapTarget";
+
 export interface HowToSearchProps {
   /** Current query. Controlled — the host owns the state and the debounce. */
   value: string;
@@ -45,6 +47,10 @@ export function HowToSearch({
           value={value}
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
+          // A search box is a control too, and a host's padding alone rarely
+          // reaches the floor — the demo's own styling landed it at 43.6px
+          // (NEH-874).
+          style={inputTapTarget}
           data-testid="howto-search-input"
         />
       </label>
@@ -58,14 +64,21 @@ export function HowToSearch({
         <ul data-testid="howto-search-results">
           {results.map(({ article, matchedHeadings }) => (
             <li key={article.meta.slug}>
-              <a href={hrefFor(article)}>{article.meta.title}</a>
+              {/* A result title is the whole of its line, with the summary
+                  below it rather than around it — a control, not a link inside
+                  a sentence (NEH-874). */}
+              <a href={hrefFor(article)} style={controlTapTarget}>
+                {article.meta.title}
+              </a>
               {article.meta.summary ? <p>{article.meta.summary}</p> : null}
 
               {matchedHeadings.length > 0 ? (
                 <ul>
                   {matchedHeadings.map((heading) => (
                     <li key={heading.id}>
-                      <a href={headingHrefFor(article, heading.id)}>{heading.text}</a>
+                      <a href={headingHrefFor(article, heading.id)} style={controlTapTarget}>
+                        {heading.text}
+                      </a>
                     </li>
                   ))}
                 </ul>

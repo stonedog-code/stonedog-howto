@@ -297,8 +297,14 @@ pre {
   border-left: 2px solid var(--line);
 }
 
+/*
+ * No `display` here. The package supplies the box for its own controls —
+ * `display: flex` with a 48px floor, as an inline style — so a `display: block`
+ * written here would be silently overridden, and a rule that has no effect is
+ * worse in a worked example than no rule at all. The padding still applies:
+ * `box-sizing: border-box` puts it inside the 48px rather than on top of it.
+ */
 .nav a {
-  display: block;
   padding: 0.28rem 0.5rem;
   border-radius: 6px;
   color: inherit;

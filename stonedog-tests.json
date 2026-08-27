@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "project": "stonedog-howto",
+  "tiers": {
+    "unit": {
+      "include": [
+        "src/**/__tests__/**/*.test.ts",
+        "src/**/__tests__/**/*.test.tsx"
+      ],
+      "exclude": ["src/**/__tests__/**/*.integration.test.ts"]
+    },
+    "integration": {
+      "include": ["src/**/__tests__/**/*.integration.test.ts"]
+    },
+    "e2e": {
+      "include": ["test/e2e/**/*.spec.ts"]
+    }
+  }
+}

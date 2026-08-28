@@ -1,0 +1,45 @@
+# What must NOT reach the build context.
+#
+# `node_modules` is the load-bearing line, and its absence was a real defect
+# rather than untidiness. The builder stage is ordered
+#
+#     COPY package.json package-lock.json ./
+#     RUN npm ci          # installs exactly the lockfile
+#     COPY . .            # ...and this overwrote it with the host's
+#
+# so without this file the gate that runs inside the image ran against whatever
+# happened to be on a developer's disk. The Dockerfile's own comment says `npm
+# ci` is there so that "a container that silently resolved different versions
+# than CI tested" cannot happen; three lines later, it did.
+#
+# It also hid a second bug completely: the host's `node_modules` carries the
+# GENERATED Prisma client, so `type-check` passed on a machine that had
+# installed and a clean clone failed with twelve errors about Prisma types
+# being `any`. Excluding this is what made that visible.
+node_modules
+
+# Build output. Regenerated in the image; copying a host build in risks the
+# image serving a `.next` compiled from source that is no longer here.
+.next
+out
+dist
+
+# Never. `.env` is local-only in this repository and that is not the point --
+# the Dockerfile states "No secret is baked in", and a rule that holds only
+# because nobody has yet put a real credential in the file is not a rule.
+.env
+.env.*
+
+# Test and coverage artefacts. Large, and meaningless inside an image.
+coverage
+test-results
+playwright-report
+.playwright-mcp
+
+# History, not source. Also large.
+.git
+.github
+
+# Editor and OS noise.
+.DS_Store
+*.log

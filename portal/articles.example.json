@@ -1,0 +1,17 @@
+{
+  "//": "Which article trees the portal reads. Copy to `articles.json` (gitignored) or point ARTICLES_CONFIG at your own. The NAME is the identity: permissions and role mappings are keyed on it, so a tree that moves on disk keeps its configuration and one removed and re-added gets it back.",
+  "//path": "A DEDICATED worktree, not somebody's working checkout. Reading a live tree means reading whatever branch a person happens to be on and whatever they have half-saved.",
+  "//refresh": "The ref a tree is moved to before each sync. OMIT IT and the tree is never touched — that opt-in is what stops the sync moving a checkout somebody is working in.",
+  "repos": [
+    {
+      "name": "Example Product",
+      "path": "/absolute/path/to/a/dedicated/worktree/src/app/how-to/articles",
+      "refresh": "origin/main"
+    },
+    {
+      "name": "Read-Only Example",
+      "//": "No `refresh`, so this tree is read exactly as it sits on disk.",
+      "path": "/absolute/path/to/another/tree/content/how-to"
+    }
+  ]
+}

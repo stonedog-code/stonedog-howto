@@ -1,0 +1,6 @@
+# The portal is private and must never be publicly reachable. This file is a
+# courtesy to a well-behaved crawler, not a control: anything that ignores it
+# is already somewhere it should not be, and the real protection is that this
+# is not deployed.
+User-agent: *
+Disallow: /

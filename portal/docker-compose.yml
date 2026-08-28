@@ -1,0 +1,42 @@
+# The portal's local dependencies.
+#
+# Postgres runs here rather than on the shared dev cluster, and that is a
+# deliberate departure from the house default worth stating.
+#
+# The house rule puts dev and test DATABASES in AWS so that the integration tier
+# runs against real Postgres with the real schema rather than a local fake. The
+# reason for that rule is realness, not location — and this is real Postgres
+# with the real migration applied. What it avoids is standing up a KMS key, a
+# cluster role, a database and a secret for an application that has no
+# production environment and is deliberately never deployed.
+#
+# If the portal ever gains a shared environment, point DATABASE_URL at the dev
+# cluster per the house procedure. Nothing else changes: the schema, the
+# migration and the stores are identical either way.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: howto-postgres
+    # Survives a reboot. The portal and the MCP server both depend on this, and
+    # a database that quietly does not come back presents as "the MCP stopped
+    # working" hours later, with nothing pointing here.
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: howto
+      POSTGRES_PASSWORD: howto-local-only
+      POSTGRES_DB: howto
+    ports:
+      # Deliberately not 5432: this machine already runs other Postgres
+      # containers, and a port clash reads as "the database is broken" rather
+      # than "something else already has that port".
+      - "55432:5432"
+    volumes:
+      - howto-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U howto -d howto"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  howto-pgdata:

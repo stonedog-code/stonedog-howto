@@ -1,0 +1,223 @@
+// The portal's data model.
+//
+// Two things here carry real weight and are worth reading before changing:
+// the partial unique index that arbitrates the first-admin race, and the
+// separation of a repository GRANT from a role MAPPING. Everything else is
+// bookkeeping.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_DIRECT_URL")
+}
+
+/// Portal roles. Guest → Reader → Writer → AccountAdmin is a genuine ladder;
+/// SystemAdmin is deliberately NOT its top rung — it holds its capabilities
+/// globally, and making it a rung would have it inherit an account admin's
+/// capabilities in whatever scope the assignment named.
+enum PortalRole {
+  Guest
+  Reader
+  Writer
+  AccountAdmin
+  SystemAdmin
+}
+
+/// How a repository named in `articles.json` relates to what the UI knows.
+///
+/// The two sides can disagree in both directions and each has a defined
+/// behaviour, which is why this is a state and not a boolean.
+enum RepoStatus {
+  /// In `articles.json` and configured in the UI. Syncs and serves.
+  Active
+  /// In `articles.json`, never configured. Syncs NOTHING — content nobody has
+  /// mapped is content nobody has decided about, and the safe state for an
+  /// undecided article is not to be in the portal at all.
+  Unconfigured
+  /// Configured in the UI, absent from `articles.json`. Articles hidden, the
+  /// mapping RETAINED so re-adding the name restores it. Dormant rather than
+  /// deleted because a typo in a config file must not destroy a mapping
+  /// somebody built by hand.
+  Dormant
+}
+
+model Account {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users User[]
+  repos Repo[]
+
+  @@map("accounts")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  accountId    String
+  email        String
+  passwordHash String
+  role         PortalRole
+  createdAt    DateTime   @default(now())
+
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  grants  RepoGrant[]
+  tokens  ApiToken[]
+
+  @@unique([accountId, email])
+  @@index([accountId])
+  @@map("users")
+}
+
+/// A source repository, as named in `articles.json`.
+///
+/// `name` is the IDENTITY, not `path`. Permissions and mappings are built in
+/// the UI against the name, so a repository that moves on disk keeps its
+/// configuration, and one that is removed and re-added gets it back.
+model Repo {
+  id        String     @id @default(cuid())
+  accountId String
+  name      String
+  /// Last path seen in `articles.json`. Null while dormant — the config no
+  /// longer names it, and remembering a path nobody declared invites syncing
+  /// from somewhere that is no longer the source of truth.
+  path      String?
+  status    RepoStatus @default(Unconfigured)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  account  Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  grants   RepoGrant[]
+  mappings RoleMapping[]
+  articles Article[]
+
+  @@unique([accountId, name])
+  @@map("repos")
+}
+
+/// One person's role in one repository. The RBAC scope, made concrete.
+model RepoGrant {
+  id     String     @id @default(cuid())
+  userId String
+  repoId String
+  role   PortalRole
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repo Repo @relation(fields: [repoId], references: [id], onDelete: Cascade)
+
+  /// One row per (person, repository, role) — a grant repeated is still one
+  /// grant, and a duplicate would make revoking it look like it failed.
+  @@unique([userId, repoId, role])
+  @@index([repoId])
+  @@map("repo_grants")
+}
+
+/// Which of a repository's OWN role names a portal role may read.
+///
+/// The join between two vocabularies. `sourceRoles` holds names written by the
+/// source application — `Organization Admin`, `Facility Admin` — which mean
+/// nothing here except through this row.
+///
+/// **Absence denies.** No row means no access; an empty `sourceRoles` with
+/// `allSourceRoles` false means the same. That is what keeps a mistake here on
+/// the side that produces a complaint (an article nobody can find) rather than
+/// the side that produces a disclosure (an article everybody can).
+model RoleMapping {
+  id     String     @id @default(cuid())
+  repoId String
+  role   PortalRole
+
+  /// The source role names this portal role may read in this repository.
+  sourceRoles String[]
+
+  /// Grants every source role, including ones added after this row was written.
+  /// For a reader trusted with a whole body of documentation, where listing the
+  /// names would mean editing this row every time somebody adds one.
+  ///
+  /// Deliberately does NOT also grant articles that declare no roles: an
+  /// article with no roles has no role to be granted — its problem is that it
+  /// is unfinished, not that it is exclusive. See `seesUnclassified`.
+  allSourceRoles Boolean @default(false)
+
+  /// Whether this portal role may read articles that declare NO roles at all.
+  ///
+  /// Defaults false, and should stay false for everyone except whoever is
+  /// expected to fix them. An article naming no audience has not said
+  /// "everyone" — it has said nothing, and the usual cause is that its author
+  /// forgot the field.
+  seesUnclassified Boolean @default(false)
+
+  repo Repo @relation(fields: [repoId], references: [id], onDelete: Cascade)
+
+  @@unique([repoId, role])
+  @@map("role_mappings")
+}
+
+/// A synced article. The portal never edits these; they are edited where they
+/// live and pulled in hourly.
+model Article {
+  id     String @id @default(cuid())
+  repoId String
+
+  /// Unique within a repository, not globally — two applications may both
+  /// document "getting-started" and neither is wrong.
+  slug    String
+  title   String
+  section String
+  order   Int     @default(0)
+  summary String?
+  body    String
+
+  /// The article's own `roles`, kept as PROVENANCE. These are the source
+  /// application's names; they grant nothing on their own and are resolved
+  /// only through this repository's `RoleMapping` rows. Worth showing a reader
+  /// deciding whether an article applies to them.
+  sourceRoles String[]
+
+  /// True when the article declared no roles at all. Denormalised from
+  /// `sourceRoles` being empty so a sync can report the count cheaply and the
+  /// UI can badge the article loudly — an omission nobody counts is an
+  /// omission nobody fixes.
+  missingRoles Boolean @default(false)
+
+  /// Path within the source repository. Diagnostics only, so a broken article
+  /// is findable; never rendered to a reader.
+  sourcePath String?
+  syncedAt   DateTime @updatedAt
+
+  repo Repo @relation(fields: [repoId], references: [id], onDelete: Cascade)
+
+  @@unique([repoId, slug])
+  @@index([repoId, missingRoles])
+  @@map("articles")
+}
+
+/// A long-lived credential for a non-browser client — the MCP server.
+///
+/// Bound to a user, so it reads exactly what that person reads and nothing
+/// more. There is no token-level scope: a second, parallel permission model is
+/// how a token ends up outliving the access it was minted alongside.
+model ApiToken {
+  id     String @id @default(cuid())
+  userId String
+
+  /// What it is for, so an operator can revoke the right one.
+  name String
+
+  /// SHA-256 of the token, never the token. It sits in a config file on
+  /// somebody's disk; a database copy that also yields working credentials
+  /// turns one leak into two.
+  tokenHash String @unique
+
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("api_tokens")
+}

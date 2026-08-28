@@ -12,6 +12,14 @@ export default [
       "coverage/**",
       "dist/**",
       "styled-system/**",
+      // The portal lints ITSELF, with its own flat config, because it is a
+      // Next.js app: it needs Next's globals and plugin rules, and this config
+      // deliberately declares no dependency on either. Linting it from here
+      // instead reports things like `process is not defined` in
+      // `next.config.mjs` -- a real error about the wrong config, not about the
+      // code. `npm run gate` runs the portal's own gate, so it is still linted,
+      // just not twice and not by the wrong ruleset.
+      "portal/**",
       "demo/dist/**",
       "demo/node_modules/**",
     ],

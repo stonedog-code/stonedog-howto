@@ -41,6 +41,13 @@ jobs:
       # Those are precisely what breaks at publish time — after review, when the
       # version is already burned and cannot be reused. So the package is packed,
       # installed into a throwaway project, and used the way a consumer would.
+      # The PORTAL's env-free tier. This workflow runs the library's steps
+      # individually rather than calling `npm run gate`, so extending that
+      # script does NOT reach CI -- the app in this repository would go
+      # entirely unchecked while the gate stayed green. It is its own step for
+      # the same reason the others are: a failure names which half broke.
+      - run: npm run gate --workspace @stonedogcode/howto-portal
+
       - run: npm run verify:package
 
       - name: Prove the gate was not vacuous
@@ -93,4 +100,77 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
+          retention-days: 7
+
+  # The portal's other two tiers. Separate job because it needs a database and a
+  # browser, and neither should delay the ~1 minute verdict above.
+  #
+  # Ported wholesale rather than rewritten: these ran in the repository the
+  # portal came from, and moving an app between repositories while quietly
+  # dropping two of its three tiers is how a suite becomes "we don't really do
+  # integration here".
+  portal-database-tiers:
+    name: portal · integration · e2e
+    runs-on: ubuntu-latest
+    # Mirrors portal/docker-compose.yml. `npm run db:up` is docker-compose and is
+    # the wrong shape for Actions; a service container is the same PostgreSQL by
+    # another route. The health check matters -- without it the first migrate
+    # races the server's startup and fails intermittently.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: howto
+          POSTGRES_PASSWORD: howto-local-only
+          POSTGRES_DB: howto
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U howto"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Same values as portal/.env.example. The port matches compose (55432, not
+      # 5432) so a developer reading a CI failure sees the URL they already know.
+      DATABASE_URL: postgresql://howto:howto-local-only@localhost:55432/howto?schema=public
+      DATABASE_DIRECT_URL: postgresql://howto:howto-local-only@localhost:55432/howto?schema=public
+      # The app refuses to start without this, by design. A throwaway value is
+      # correct here and this must never be a real secret -- CI has no session to
+      # protect, and a real one in a workflow file is a credential in git.
+      SESSION_SECRET: ci-only-session-secret-not-a-real-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # The generated Prisma client is what `tsc` and jest read, and a clean
+      # checkout has none. See portal/package.json's `pretype-check`.
+      - run: npm run db:generate --workspace @stonedogcode/howto-portal
+
+      # No `prisma migrate deploy` step. Both tiers below run against `howto_test`
+      # -- derived from DATABASE_URL, created and migrated by their shared
+      # globalSetup -- so a step migrating `howto` would prepare a database
+      # nothing then reads, and would read like the thing that made them work.
+      - name: Integration tier
+        run: npm run test:integration --workspace @stonedogcode/howto-portal
+
+      # Playwright builds and starts its own server with reuseExistingServer
+      # false, so this needs no separate start step -- and must not get one. A
+      # suite that passes against a server someone else started proves nothing
+      # about this commit.
+      - run: npx playwright install --with-deps chromium
+
+      - name: E2E tier
+        run: npm run test:e2e --workspace @stonedogcode/howto-portal
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-playwright-report
+          path: portal/playwright-report/
           retention-days: 7

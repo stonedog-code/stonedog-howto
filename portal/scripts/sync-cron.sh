@@ -108,16 +108,29 @@ log "sync starting"
 # ---------------------------------------------------------------------------
 # `path<TAB>refresh-target`, with an empty second field when the entry does not
 # opt in.
-PATHS="$(node -e '
+# ARTICLES_CONFIG, with the same default `sync-once.ts` uses. Two readers of
+# one config file and only one of them honouring the override is a drift
+# waiting to happen -- and it became load-bearing when the portal moved into
+# this public repository and the config stayed behind in the private one, which
+# is where the owner's article paths belong.
+ARTICLES_CONFIG="${ARTICLES_CONFIG:-$REPO_ROOT/articles.json}"
+
+if [ ! -f "$ARTICLES_CONFIG" ]; then
+  # Named, not silent. A missing config and a config listing nothing both end
+  # up refreshing no trees, and only one of them is a mistake.
+  log "WARN no articles config at $ARTICLES_CONFIG — set ARTICLES_CONFIG or copy articles.example.json"
+fi
+
+PATHS="$(ARTICLES_CONFIG="$ARTICLES_CONFIG" node -e '
   const { readFileSync } = require("node:fs");
-  const config = JSON.parse(readFileSync("articles.json", "utf8"));
+  const config = JSON.parse(readFileSync(process.env.ARTICLES_CONFIG, "utf8"));
   for (const repo of config.repos ?? []) {
     if (repo?.path) console.log(`${repo.path}\t${repo.refresh ?? ""}`);
   }
 ' 2>/dev/null)"
 
 if [ -z "$PATHS" ]; then
-  log "WARN could not read any paths from articles.json — nothing to refresh"
+  log "WARN could not read any paths from $ARTICLES_CONFIG — nothing to refresh"
 fi
 
 while IFS=$'\t' read -r articles_path refresh_target; do
@@ -193,7 +206,7 @@ done <<< "$PATHS"
 # carried out of here rather than swallowed — a cron job that always exits 0
 # reports success forever while the archive goes incomplete.
 # ---------------------------------------------------------------------------
-npm run --silent sync
+ARTICLES_CONFIG="$ARTICLES_CONFIG" npm run --silent sync
 STATUS=$?
 
 if [ "$STATUS" -eq 0 ]; then

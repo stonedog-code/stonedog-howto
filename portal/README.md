@@ -217,8 +217,15 @@ A crontab line, because the portal runs on one machine and a scheduler inside
 the app would be a daemon to supervise for no gain:
 
 ```cron
-0 * * * * npm run sync >> /tmp/howto-sync.log 2>&1
+17 * * * * ARTICLES_CONFIG=/path/to/articles.json /path/to/portal/scripts/sync-cron.sh >> ~/.local/state/howto/sync.log 2>&1
 ```
+
+`sync-cron.sh` reads `DATABASE_URL` from `portal/.env` itself — copy
+`.env.example`. Prisma will not find that file on its own: npm workspaces hoist
+the generated client to the repository root, and a client generated there loads
+no `.env` at all, so a cron run that relied on it failed every hour with
+*"Environment variable not found: DATABASE_URL"*. A variable already exported
+wins over the file, and a run with neither stops with a `FATAL` naming it.
 
 ### The paths are read at sync time, from the working tree
 

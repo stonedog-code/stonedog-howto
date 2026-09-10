@@ -104,6 +104,47 @@ log()   { printf '%s  %s\n' "$(stamp)" "$*"; }
 log "sync starting"
 
 # ---------------------------------------------------------------------------
+# 0. The database URL, from the portal's own .env.
+#
+# Loaded HERE, explicitly, and not left to Prisma. Prisma looks for a .env only
+# where its client was generated, and this workspace hoists that client to the
+# repository root: a client generated there carries `rootEnvPath: null` and no
+# schema env path, so it loads no .env at all. Every hourly run from 2026-08-30
+# died with "Environment variable not found: DATABASE_URL" while a correct .env
+# could have sat right beside this script.
+#
+# A variable already in the environment wins, for the same reason PATH is
+# appended above rather than assigned: an operator who exported one meant it.
+# Names are logged, never values.
+# ---------------------------------------------------------------------------
+ENV_FILE="$REPO_ROOT/.env"
+if [ -f "$ENV_FILE" ]; then
+  loaded=()
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%$'\r'}"
+    case "$line" in '' | '#'*) continue ;; esac
+    key="${line%%=*}"
+    [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+    [ -n "${!key+x}" ] && continue
+    value="${line#*=}"
+    case "$value" in
+      \"*\" | \'*\') value="${value:1:${#value}-2}" ;;
+    esac
+    export "$key=$value"
+    loaded+=("$key")
+  done < "$ENV_FILE"
+  log "env  loaded ${#loaded[@]} name(s) from $ENV_FILE${loaded[*]:+: ${loaded[*]}}"
+fi
+
+# Refused by name, before the sync. Left to Prisma, the same fact arrives as a
+# forty-line stack trace that reads like a code defect.
+if [ -z "${DATABASE_URL:-}" ]; then
+  log "FATAL DATABASE_URL is not set and $ENV_FILE does not provide it — copy .env.example to .env"
+  log "sync finished with status 1 — something was skipped or the config is wrong. Read the lines above."
+  exit 1
+fi
+
+# ---------------------------------------------------------------------------
 # 1. Refresh each source tree we own.
 # ---------------------------------------------------------------------------
 # `path<TAB>refresh-target`, with an empty second field when the entry does not
